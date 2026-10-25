@@ -1,0 +1,17 @@
+---
+import { SITE } from '../lib/data'
+
+type Props = { note?: string | undefined }
+const note = Astro.props.note ?? `${SITE.slug} · MIT`
+---
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span class="mono muted" style="font-size: 10.5px">{note}</span>
+    <div class="legal">
+      <a href={`${SITE.repoUrl}/blob/main/docs/PRIVACY.md`}>Privacy</a>
+      <a href={`${SITE.repoUrl}/blob/main/CHANGELOG.md`}>Changelog v{SITE.release}</a>
+      <a href={SITE.landingUrl}>Kestrel Collective</a>
+    </div>
+  </div>
+</footer>

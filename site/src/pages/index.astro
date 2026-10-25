@@ -1,0 +1,90 @@
+---
+import EmptyCard from '../components/EmptyCard.astro'
+import Ladder from '../components/Ladder.astro'
+import PersonCard from '../components/PersonCard.astro'
+import Base from '../layouts/Base.astro'
+import { byActivity, cohorts, contributors, SITE } from '../lib/data'
+import { plural } from '../lib/format'
+
+const recent = byActivity(contributors).slice(0, 4)
+const first = recent[0]
+const learnerLink = first
+  ? { href: `/p/${first.handle}/`, label: "See a learner's page" }
+  : { href: `${SITE.repoUrl}/tree/main/contributors/_example`, label: 'See the page template' }
+const stageOne = `${SITE.repoUrl}/issues?q=is%3Aopen+label%3Astage%3A1`
+const description =
+  "Nest is Kestrel Collective's open-source onboarding project. Every new contributor builds a portfolio page here through real pull requests, and it keeps growing with every verified contribution they make anywhere."
+---
+
+<Base title="Nest: a starter project that grows with you" description={description}>
+  <main id="main">
+    <section class="section-hero">
+      <div class="wrap grid-12 center">
+        <div class="span-7">
+          <span class="eyebrow">A starter project that grows with you</span>
+          <h1 class="mt-2" style="font-size: clamp(32px, 4vw, 44px)">Your first open-source contributions, in a codebase built for them.</h1>
+          <p class="lead mt-3" style="max-width: 54ch; font-size: 16px">
+            Nest is a real, maintained open-source project. Every new Kestrel contributor gets a page here that they build themselves, pull request by pull request, and that keeps growing with every verified contribution they make anywhere.
+          </p>
+          <div class="row mt-4">
+            <a href={stageOne} class="btn btn-primary">Start with Stage 1</a>
+            <a href={learnerLink.href} class="btn btn-secondary">{learnerLink.label}</a>
+          </div>
+          <div class="row mt-4 mono muted" style="gap: 22px; font-size: 11px">
+            <span><b style="color: var(--ink); font-size: 15px">{contributors.length}</b> contributor {contributors.length === 1 ? 'page' : 'pages'}</span>
+            <span><b style="color: var(--ink); font-size: 15px">{cohorts.length}</b> {cohorts.length === 1 ? 'cohort' : 'cohorts'}</span>
+            <span><b style="color: var(--ink); font-size: 15px">v{SITE.release}</b> latest release</span>
+          </div>
+        </div>
+        <div class="span-5 code-panel" aria-label="Example profile file">
+          <div class="hd">contributors/your-login/profile.yml</div>
+          <div><span class="k">handle:</span> your-login</div>
+          <div><span class="k">name:</span> Your Name</div>
+          <div><span class="k">cohort:</span> 2027-01</div>
+          <div><span class="k">skills_developing:</span></div>
+          <div class="in">- debugging</div>
+          <div class="in">- reading unfamiliar code</div>
+          <div><span class="k">visibility:</span></div>
+          <div class="in"><span class="k">page:</span> public</div>
+          <div class="ft">&#10003; validate · &#10003; build · preview deployed</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" style="padding-top: 20px">
+      <div class="wrap">
+        <div class="label mb-2">The ladder · an invitation, not a gate</div>
+        <Ladder detail />
+        <p class="muted mt-2" style="font-size: 12.5px">Experienced already? Skip to Stage 5 or straight to the Kestrel board. Nothing here is required for anything else.</p>
+      </div>
+    </section>
+
+    <section class="section" style="padding-top: 20px">
+      <div class="wrap">
+        <div class="row between mb-2">
+          <div class="label">{first ? `Recent pages · ${plural(contributors.length, 'page')}` : 'Pages'}</div>
+          <a href="/cohorts/" style="font-size: 12.5px; font-weight: 700">All cohorts &#8594;</a>
+        </div>
+        <div class="grid grid-4">
+          {
+            first ? (
+              recent.map((c) => <PersonCard contributor={c} />)
+            ) : (
+              <EmptyCard title="The first pages are being built right now." className="span-2">
+                Pages appear here when their owners publish them. The project is open to clone now.
+              </EmptyCard>
+            )
+          }
+        </div>
+      </div>
+    </section>
+
+    <section class="section" style="padding-top: 20px; padding-bottom: 64px">
+      <div class="wrap grid grid-3">
+        <div class="card"><div class="label">A real project</div><p class="ink2 mt-1" style="font-size: 13px">CI on every PR, previews, CODEOWNERS, ADRs, a public roadmap and quarterly releases. The same workflow you will meet everywhere else.</p></div>
+        <div class="card"><div class="label">Evidence, labelled honestly</div><p class="ink2 mt-1" style="font-size: 13px">Pages separate practice in your own directory, contributions to Nest's shared code, and work accepted by other projects. Nothing is dressed up as more than it is.</p></div>
+        <div class="card"><div class="label">Yours, for good</div><p class="ink2 mt-1" style="font-size: 13px">Publish what you choose, edit forever, unpublish with one PR. Your page keeps growing after onboarding ends, from verified work, wherever you do it.</p></div>
+      </div>
+    </section>
+  </main>
+</Base>

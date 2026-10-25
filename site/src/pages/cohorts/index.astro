@@ -1,0 +1,41 @@
+---
+import { cohortDisplayName } from '@nest/schema'
+import EmptyCard from '../../components/EmptyCard.astro'
+import Base from '../../layouts/Base.astro'
+import { cohorts, SITE, summarize } from '../../lib/data'
+import { formatRange, plural } from '../../lib/format'
+
+const summaries = cohorts.map(summarize)
+const nav = [
+  { href: '/cohorts/', label: 'Cohorts', current: true },
+  { href: `${SITE.repoUrl}/blob/main/docs/roadmap.md`, label: 'Roadmap' },
+]
+---
+
+<Base title="Cohorts on Nest" description="Every Nest cohort, with the contributor pages its members have published." nav={nav}>
+  <main id="main" class="section" style="padding-top: 44px; padding-bottom: 72px">
+    <div class="wrap">
+      <span class="eyebrow">Cohorts</span>
+      <h1 class="mt-2" style="font-size: clamp(26px, 3vw, 34px)">One cohort at a time.</h1>
+      <p class="ink2 mt-2" style="max-width: 56ch">A cohort is a group that starts the ladder together. Its page lists the member pages that have been published, and nothing about the members who have not.</p>
+      <div class="grid grid-3 mt-4">
+        {
+          summaries.length > 0 ? (
+            summaries.map((s) => (
+              <a href={`/cohorts/${s.cohort.id}/`} class="card card-tight card-link">
+                <div class="label">{s.cohort.id}</div>
+                <div class="mt-1" style="font-weight: 700; font-size: 16px">{cohortDisplayName(s.cohort.id)}</div>
+                <div class="mono muted mt-1" style="font-size: 11px">{formatRange(s.cohort.starts, s.cohort.ends)}</div>
+                <div class="muted mt-2" style="font-size: 12.5px">{plural(s.cohort.members.length, 'member')} · {plural(s.published.length, 'page')} published</div>
+              </a>
+            ))
+          ) : (
+            <EmptyCard title="No cohort has been opened yet." className="span-2">
+              The first cohort appears here once its cohort.yml is merged and the pages start to be published.
+            </EmptyCard>
+          )
+        }
+      </div>
+    </div>
+  </main>
+</Base>

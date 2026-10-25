@@ -1,0 +1,67 @@
+---
+import { cohortDisplayName, type Cohort } from '@nest/schema'
+import EmptyCard from '../../../components/EmptyCard.astro'
+import Legend from '../../../components/Legend.astro'
+import PersonCard from '../../../components/PersonCard.astro'
+import Base from '../../../layouts/Base.astro'
+import { cohorts, SITE, summarize } from '../../../lib/data'
+import { formatRange, plural } from '../../../lib/format'
+
+export function getStaticPaths() {
+  return cohorts.map((cohort) => ({ params: { id: cohort.id }, props: { cohort } }))
+}
+
+const { cohort } = Astro.props as { cohort: Cohort }
+const s = summarize(cohort)
+const name = cohortDisplayName(cohort.id)
+const nav = [
+  { href: '/cohorts/', label: 'Cohorts', current: true },
+  { href: `${SITE.repoUrl}/blob/main/docs/roadmap.md`, label: 'Roadmap' },
+]
+const issues = `${SITE.repoUrl}/issues?q=label%3Acohort%3A${cohort.id}`
+---
+
+<Base title={`Cohort ${cohort.id} on Nest`} description={`The ${name}: published contributor pages and progress on the ladder.`} nav={nav}>
+  <main id="main" class="section" style="padding-top: 44px; padding-bottom: 72px">
+    <div class="wrap">
+      <div class="mono mb-2" style="font-size: 11px"><a href="/cohorts/" style="text-decoration: none">&#8592; All cohorts</a></div>
+      <div class="row between" style="align-items: flex-end; gap: 16px">
+        <div>
+          <span class="eyebrow">Cohort {cohort.id}</span>
+          <h1 class="mt-2" style="font-size: clamp(26px, 3vw, 34px)">{name}</h1>
+          <div class="mono muted mt-1" style="font-size: 11px">{formatRange(cohort.starts, cohort.ends)} · {plural(cohort.members.length, 'member')} · {plural(s.published.length, 'page')} published</div>
+        </div>
+        <div class="row">
+          <a href={issues} class="btn btn-secondary btn-sm">Cohort issues on GitHub</a>
+          <a href={`${SITE.repoUrl}/blob/main/CHANGELOG.md`} class="btn btn-primary btn-sm">Release v{SITE.release} changelog</a>
+        </div>
+      </div>
+
+      <div class="grid grid-4 mt-4" style="gap: 12px">
+        <div class="stat"><div class="k">Pages published</div><div class="v">{s.published.length} of {cohort.members.length}</div><div class="s">each one by its owner's choice</div></div>
+        <div class="stat"><div class="k">Stages completed</div><div class="v">{s.stagesCompleted}</div><div class="s">across published pages</div></div>
+        <div class="stat"><div class="k">Shared-code PRs merged</div><div class="v">{s.shared}</div><div class="s">by owners of published pages</div></div>
+        <div class="stat"><div class="k">External contributions</div><div class="v">{s.external}</div><div class="s">listed by their owners</div></div>
+      </div>
+
+      <div class="row between mt-5 mb-2">
+        <div class="label">Members · published pages only</div>
+        <Legend />
+      </div>
+
+      <div class="grid grid-4">
+        {s.published.map((c) => <PersonCard contributor={c} counts="markers" />)}
+        {s.unpublished > 0 && (
+          <EmptyCard title={`${plural(s.unpublished, 'member has', 'members have')} not published yet`}>
+            Pages appear here when their owner chooses.
+          </EmptyCard>
+        )}
+        {s.published.length === 0 && s.unpublished === 0 && (
+          <EmptyCard title="No members yet." className="span-2">Members are listed in cohort.yml.</EmptyCard>
+        )}
+      </div>
+
+      <p class="muted mt-3" style="font-size: 12px">Counts come from merged pull requests and from what each owner lists. Live pages keep growing. No member is ranked.</p>
+    </div>
+  </main>
+</Base>

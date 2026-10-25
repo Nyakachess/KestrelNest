@@ -11,14 +11,19 @@
     "node": ">=20.3.0"
   },
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "site"
   ],
   "scripts": {
-    "build": "tsc -b",
+    "build": "tsc -b && npm run build -w site",
+    "dev": "npm run dev -w site",
+    "preview": "npm run preview -w site",
     "test": "vitest run",
     "typecheck": "tsc -b --dry",
     "lint": "prettier --check . && node scripts/check-dashes.mjs",
     "format": "prettier --write .",
+    "validate": "nest validate",
+    "feed": "nest feed",
     "prepare": "tsc -b"
   },
   "devDependencies": {

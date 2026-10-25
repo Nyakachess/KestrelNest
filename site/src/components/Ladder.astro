@@ -1,0 +1,24 @@
+---
+import { SHARED_STAGE, STAGES } from '@nest/schema'
+
+/** The seven stages. With `done` it shows progress; without it, the overview with Stage 5 highlighted. */
+type Props = { done?: number[] | undefined; detail?: boolean }
+const { done, detail = false } = Astro.props
+const progress = done !== undefined
+---
+
+<div class="ladder">
+  {
+    STAGES.map((s) => {
+      const isDone = progress && done.includes(s.number)
+      const cls = progress ? (isDone ? 'step done' : 'step todo') : s.number === SHARED_STAGE ? 'step highlight' : 'step'
+      return (
+        <div class={cls}>
+          <div class="n">{progress ? `${s.number}${isDone ? ' ✓' : ''}` : `Stage ${s.number}`}</div>
+          <div class="t">{s.title}</div>
+          {detail && <div class="d">{s.short}</div>}
+        </div>
+      )
+    })
+  }
+</div>

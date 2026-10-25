@@ -1,0 +1,8 @@
+---
+/** An evidence marker: a shape and colour next to a text label, so colour is never the only signal. */
+type Props = { kind: 'external' | 'shared' | 'practice'; count?: number | undefined; label?: string | undefined }
+const { kind, count, label } = Astro.props
+const text = label ?? kind
+---
+
+<span class="mark"><span class={`marker marker-${kind}`} aria-hidden="true"></span>{count === undefined ? text : `${count} ${text}`}</span>
