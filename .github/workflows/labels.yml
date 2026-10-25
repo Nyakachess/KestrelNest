@@ -1,0 +1,22 @@
+name: Sync labels
+
+on:
+  push:
+    branches: [main]
+    paths: ['.github/labels.json', '.github/scripts/sync-labels.mjs']
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: node .github/scripts/sync-labels.mjs

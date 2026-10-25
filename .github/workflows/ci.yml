@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Validate contributor and cohort files
+        run: npm run validate
+      - name: Tests
+        run: npm test
+      - name: Formatting and em dashes
+        run: npm run lint
+      - name: Astro type check
+        run: npm run check -w site
+      - name: Build packages and site
+        run: npm run build
+      - name: Feed has the agreed shape
+        run: |
+          node -e "
+            const f = require('./site/dist/api/pages.json')
+            const ok = typeof f.generated_at === 'string' && typeof f.release === 'string' && Array.isArray(f.pages)
+            if (!ok) { console.error('pages.json is not { generated_at, release, pages[] }'); process.exit(1) }
+            console.log('pages.json ok, ' + f.pages.length + ' page(s), release ' + f.release)
+          "
+      - uses: actions/upload-artifact@v4
+        with:
+          name: site
+          path: site/dist
+          retention-days: 7

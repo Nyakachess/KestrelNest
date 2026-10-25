@@ -19,3 +19,5 @@ export {
   type OpenCohortOptions,
   type OpenCohortReport,
 } from './commands/open-cohort.js'
+export * from './paths.js'
+export * from './practice.js'

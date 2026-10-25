@@ -1,0 +1,25 @@
+name: Proposal
+description: Stage 7. Propose a change to how Nest works
+labels: [proposal]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: What is hard, slow or confusing today, and for whom.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: The proposal
+      description: What you would change. Small is good.
+    validations:
+      required: true
+  - type: textarea
+    id: tradeoffs
+    attributes:
+      label: What it costs
+      description: What gets harder, what breaks, what has to be maintained.
+    validations:
+      required: true

@@ -8,7 +8,7 @@ A page has to be safe to edit without coordination, safe to review by anyone, an
 
 ## Decision
 
-Each contributor owns `contributors/<handle>/`, named after their GitHub login in lower case. Only the owner changes it; CODEOWNERS enforces this. `visibility.page` in `profile.yml` decides whether the page is built. Directories whose name starts with an underscore are templates and can never publish.
+Each contributor owns `contributors/<handle>/`, named after their GitHub login in lower case. Only the owner changes it: the auto-merge workflow lets only the owner merge changes to it, and CODEOWNERS routes everything else to maintainers. `visibility.page` in `profile.yml` decides whether the page is built. Directories whose name starts with an underscore are templates and can never publish.
 
 ## Consequences
 

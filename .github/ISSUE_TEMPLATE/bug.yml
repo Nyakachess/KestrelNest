@@ -1,0 +1,24 @@
+name: Bug
+description: Something in Nest is wrong
+labels: [bug]
+body:
+  - type: textarea
+    id: did
+    attributes:
+      label: What I did
+      placeholder: The command I ran or the page I opened.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What I expected
+    validations:
+      required: true
+  - type: textarea
+    id: happened
+    attributes:
+      label: What happened instead
+      description: Paste the exact error text if there is one.
+    validations:
+      required: true

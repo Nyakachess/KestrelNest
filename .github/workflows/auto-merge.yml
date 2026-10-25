@@ -1,0 +1,40 @@
+name: Auto-merge own directory
+
+# Runs on the base branch with write access. It never checks out or executes the pull
+# request's code: the list of changed files comes from the API, and the check itself is
+# the tested function in packages/cli/src/paths.ts built from main.
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  own-directory:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Check that every changed file is in the author's own directory
+        id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+        run: node .github/scripts/check-own-dir.mjs
+      - name: Enable auto-merge
+        if: steps.check.outputs.own == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: gh pr merge "$PR_NUMBER" --auto --squash --repo "$GITHUB_REPOSITORY"
+      - name: Explain why a maintainer reviews this one
+        if: steps.check.outputs.own != 'true'
+        run: echo "::notice::${{ steps.check.outputs.reason }}"

@@ -1,0 +1,48 @@
+name: Practice counts
+
+# Writes contributors/<handle>/.practice.json from merged pull requests and closed stage
+# issues, then commits to main. The site build reads these files and never calls GitHub.
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '17 2 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: read
+  pull-requests: read
+
+concurrency:
+  group: practice-counts
+  cancel-in-progress: false
+
+jobs:
+  update:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Compute counts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node .github/scripts/practice-counts.mjs
+      - name: Validate the result
+        run: npm run validate
+      - name: Commit and push when something changed
+        run: |
+          if git diff --quiet -- contributors; then
+            echo "No count changes."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add contributors/*/.practice.json
+          git commit -m "chore: update practice counts"
+          git push

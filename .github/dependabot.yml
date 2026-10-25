@@ -1,0 +1,14 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      all:
+        patterns: ['*']
+    labels: [good-shared-issue]
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
