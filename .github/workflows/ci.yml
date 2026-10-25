@@ -36,7 +36,7 @@ jobs:
             if (!ok) { console.error('pages.json is not { generated_at, release, pages[] }'); process.exit(1) }
             console.log('pages.json ok, ' + f.pages.length + ' page(s), release ' + f.release)
           "
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: site
           path: site/dist
