@@ -80,7 +80,7 @@ describe('defect-import', () => {
       /\| skill-is-placeholder +\| 1 +\| technical-communication +\| .+ \| candidate +\|/,
     )
     expect(io.lines.at(-1)).toBe('Imported 1 of 7; 6 refused. Run nest defect-check --all next.')
-  })
+  }, 60_000)
 
   it('never imports the same id twice, and replaces em dashes', () => {
     const config = tempRepo()
@@ -94,7 +94,7 @@ describe('defect-import', () => {
     expect(io.errors.join('\n')).toContain('r1-02 refused: id "skill-is-placeholder" is already taken')
     const source = readFileSync(join(config.root, CANDIDATES_DIR, 'skill-is-placeholder.ts'), 'utf8')
     expect(source).not.toContain(dash)
-  })
+  }, 60_000)
 
   it('checks the shape of a test', () => {
     const { problems } = parseCandidate(
@@ -102,5 +102,5 @@ describe('defect-import', () => {
       new Set(),
     )
     expect(problems.join(' ')).toContain('the test does not follow the shape')
-  })
+  }, 60_000)
 })

@@ -1,6 +1,7 @@
 import { flagBool, flagString, parseArgs, UsageError } from './args.js'
 import { runDefectCheck } from './commands/defect-check.js'
 import { runDefectImport } from './commands/defect-import.js'
+import { runDefectPromote } from './commands/defect-promote.js'
 import { runDefectRequest } from './commands/defect-request.js'
 import { enroll, type EnrollMode } from './commands/enroll.js'
 import { runFeed } from './commands/feed.js'
@@ -22,7 +23,7 @@ Usage: nest <command> [options]
 
   validate                         Check every contributor and cohort directory.
   scaffold <handle>                Create contributors/<handle>/ from the template.
-      [--cohort <id|none>] [--defect <1-5|id|none>] [--force] [--template]
+      [--cohort <id|none>] [--defect <number|id|none>] [--force] [--template]
   new-task <stage> --handle <h>    Print the issue for a stage, or create it with --gh.
       [--cohort <id|none>] [--gh] [--dry-run]
   feed [--out <file>]              Print the pages feed, or write it to a file.
@@ -34,6 +35,7 @@ Usage: nest <command> [options]
       [--count <n>] [--out <file>]
   defect-import <runner-output>    Write the runner's acceptable outputs as candidate defects.
   defect-check <id> | --all        Run the gate on candidate defects and record the results.
+  defect-promote <id>              Move a candidate that passed the gate into the bank.
 
 Every command accepts --root <dir>. Without it the repository is found from the current directory.
 --dry-run prints what would happen and makes no GitHub calls. Without --gh the bodies are printed instead.`
@@ -130,6 +132,8 @@ export function main(argv: readonly string[]): number | Promise<number> {
     }
     case 'defect-check':
       return runDefectCheck(config, { id: positionals[0], all: flagBool(flags, 'all') }, io)
+    case 'defect-promote':
+      return runDefectPromote(config, positionals[0], io)
     case 'defect-import': {
       const file = positionals[0]
       if (!file) throw new UsageError('defect-import needs the runner output file: nest defect-import <file>')

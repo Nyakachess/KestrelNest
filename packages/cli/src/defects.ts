@@ -1,4 +1,6 @@
 import { isPlaceholder, PAGE_SECTIONS, type Cohort, type Contributor } from '@nest/schema'
+import type { Competency, Tier } from './defect-bank/types.js'
+import { PROMOTED } from './defects/bank.js'
 import type { ScaffoldPlan } from './templates.js'
 
 /**
@@ -8,10 +10,16 @@ import type { ScaffoldPlan } from './templates.js'
  *
  * Detectors compare against the cohort window, never against today, because scaffolds are
  * opened before a cohort starts.
+ *
+ * These five are tier 1 of the bank (ADR 0009). Promoted defects, numbered from 6, are added
+ * from defects/bank.ts; BANK is the whole set.
  */
 export type Defect = {
   id: string
-  number: 1 | 2 | 3 | 4 | 5
+  number: number
+  /** 1 easy, 2 medium, 3 hard (ADR 0009). */
+  tier: Tier
+  competency: Competency
   /** What the owner sees on the live page. Used in maintainer output only. */
   symptom: string
   apply: (plan: ScaffoldPlan) => void
@@ -27,6 +35,8 @@ export const DEFECTS: readonly Defect[] = [
   {
     id: 'joined-after-cohort',
     number: 1,
+    tier: 1,
+    competency: 'debugging',
     symptom: 'The page says the owner joined fifty years from now.',
     apply: (plan) => {
       plan.joined = shiftYear(plan.joined, 50)
@@ -43,6 +53,8 @@ export const DEFECTS: readonly Defect[] = [
   {
     id: 'joined-before-cohort',
     number: 2,
+    tier: 1,
+    competency: 'debugging',
     needsCohort: true,
     symptom: 'The page says the owner joined a year before their cohort started.',
     apply: (plan) => {
@@ -56,6 +68,8 @@ export const DEFECTS: readonly Defect[] = [
   {
     id: 'sections-out-of-order',
     number: 3,
+    tier: 1,
+    competency: 'debugging',
     symptom: 'The page reads backwards: "What I am working on next" comes first.',
     apply: (plan) => {
       plan.sectionOrder = [...plan.sectionOrder].reverse()
@@ -70,6 +84,8 @@ export const DEFECTS: readonly Defect[] = [
   {
     id: 'placeholder-next',
     number: 4,
+    tier: 1,
+    competency: 'debugging',
     symptom: 'The page shows template text where "What I am working on next" should be.',
     apply: (plan) => {
       plan.next = 'Replace this with the one thing you want to learn next.'
@@ -82,6 +98,8 @@ export const DEFECTS: readonly Defect[] = [
   {
     id: 'name-is-handle',
     number: 5,
+    tier: 1,
+    competency: 'debugging',
     symptom: 'The page shows the GitHub handle where the name should be.',
     apply: (plan) => {
       plan.name = plan.handle
@@ -93,8 +111,14 @@ export const DEFECTS: readonly Defect[] = [
   },
 ]
 
+/** The whole bank: the first five, then every promoted defect in number order. */
+export const BANK: readonly Defect[] = [
+  ...DEFECTS,
+  ...PROMOTED.map(({ number, defect }) => ({ ...defect, number })),
+]
+
 export function defectByNumberOrId(value: string): Defect | undefined {
-  return DEFECTS.find((d) => d.id === value || String(d.number) === value)
+  return BANK.find((d) => d.id === value || String(d.number) === value)
 }
 
 /**
@@ -114,7 +138,7 @@ export function detectDefects(
   cohort: Cohort | undefined,
 ): { defect: Defect; finding: string }[] {
   const out: { defect: Defect; finding: string }[] = []
-  for (const defect of DEFECTS) {
+  for (const defect of BANK) {
     const finding = defect.detect(c, cohort)
     if (finding) out.push({ defect, finding })
   }

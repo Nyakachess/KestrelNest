@@ -2,6 +2,7 @@ import { execFileSync } from 'node:child_process'
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { CANDIDATES_DIR, type RunnerOutput } from './request.js'
 import { COMPETENCIES, isDefectId, TIERS, type Competency, type Tier } from './types.js'
 
@@ -132,11 +133,17 @@ const noDashes = (s: string) => s.split(EM_DASH).join(', ')
 /** Formats files with the repository's Prettier. False when a file does not parse. */
 export function prettierWrite(root: string, files: readonly string[]): boolean {
   const require = createRequire(import.meta.url)
+  // the repository's own style, wherever the files are (the gate and the tests use scratch copies)
+  const config = fileURLToPath(new URL('../../../../.prettierrc', import.meta.url))
   try {
-    execFileSync(process.execPath, [require.resolve('prettier/bin/prettier.cjs'), '--write', ...files], {
-      cwd: root,
-      stdio: 'pipe',
-    })
+    execFileSync(
+      process.execPath,
+      [require.resolve('prettier/bin/prettier.cjs'), '--config', config, '--write', ...files],
+      {
+        cwd: root,
+        stdio: 'pipe',
+      },
+    )
     return true
   } catch {
     return false

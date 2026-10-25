@@ -2,7 +2,7 @@ import { existsSync, mkdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { CONTRIBUTORS_DIR, explainHandle, isTemplateDir, listCohortIds, validateCohort } from '@nest/schema'
 import { UsageError } from '../args.js'
-import { DEFECTS, defectByNumberOrId, pickDefect, type Defect } from '../defects.js'
+import { BANK, defectByNumberOrId, pickDefect, type Defect } from '../defects.js'
 import { NO_COHORT } from '../issue-body.js'
 import type { RepoConfig } from '../root.js'
 import { defaultPlan, renderAll, type ScaffoldFiles } from '../templates.js'
@@ -68,7 +68,7 @@ export function planScaffold(config: RepoConfig, opts: ScaffoldOptions): Scaffol
   else {
     defect = defectByNumberOrId(opts.defect) ?? null
     if (!defect)
-      throw new UsageError(`Unknown defect "${opts.defect}". Use 1 to ${DEFECTS.length}, an id, or none.`)
+      throw new UsageError(`Unknown defect "${opts.defect}". Use 1 to ${BANK.length}, an id, or none.`)
   }
   if (defect) defect.apply(plan)
 
