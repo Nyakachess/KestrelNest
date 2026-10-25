@@ -23,3 +23,21 @@ Most real work is changing something that already exists without breaking it. Th
 ## If you get stuck
 
 After thirty minutes of real looking, comment here with your notes so far. A maintainer will give you a narrower place to look, not the answer.
+
+<!-- Machine-readable summary read by the Kestrel platform. Keep it in step with the text above. -->
+
+```kestrel-ticket
+stage: 3
+reserved_for: {{handle}}
+cohort: {{cohort}}
+evidence: practice
+title: {{stage_title}}
+steps:
+  - Read your live page and find what is wrong
+  - Write down what you saw and what you expected
+  - Write your hypothesis before checking it
+  - Fix it with the smallest change and open a pull request
+done_when:
+  - Your notes are on the issue
+  - The fix merged and the page shows the right thing
+```

@@ -22,3 +22,20 @@ Until now every task was handed to you. The last rung is noticing something that
 ## What happens next
 
 Nothing here is required for anything else. Your page keeps growing from merged work anywhere you do it, listed in your `profile.yml`. Come back whenever you like: Stage 5 issues are always open, and the people who follow you will need reviewers.
+
+<!-- Machine-readable summary read by the Kestrel platform. Keep it in step with the text above. -->
+
+```kestrel-ticket
+stage: 7
+reserved_for: {{handle}}
+cohort: {{cohort}}
+evidence: proposal
+title: {{stage_title}}
+steps:
+  - Pick one thing that was harder than it needed to be
+  - Open a proposal issue with the problem, the proposal and the cost
+  - Answer the comments and shrink it if needed
+done_when:
+  - Your proposal has all three parts and evidence
+  - It has a decision
+```

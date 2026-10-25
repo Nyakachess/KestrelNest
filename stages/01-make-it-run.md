@@ -29,6 +29,7 @@ A separate draft pull request titled "Scaffold for @{{handle}}" already exists. 
 
 ## Done when
 
+- [ ] Accept the collaborator invitation GitHub emailed you, then clone the repo.
 - [ ] `npm test` passes on your machine.
 - [ ] Your pull request is merged and your handle is in `CONTRIBUTORS.md` on `main`.
 - [ ] You can say, in one sentence each, what a branch, a commit and a pull request are.
@@ -36,3 +37,22 @@ A separate draft pull request titled "Scaffold for @{{handle}}" already exists. 
 ## If you get stuck
 
 Comment here with the exact command you ran and the exact text it printed. Being stuck at this stage is normal; the question helps the next person too.
+
+<!-- Machine-readable summary read by the Kestrel platform. Keep it in step with the text above. -->
+
+```kestrel-ticket
+stage: 1
+reserved_for: {{handle}}
+cohort: {{cohort}}
+evidence: practice
+title: {{stage_title}}
+steps:
+  - Accept the collaborator invitation GitHub emailed you, then clone the repo
+  - Run npm install and npm test
+  - Add your handle to CONTRIBUTORS.md on a branch
+  - Open a pull request and get it merged
+done_when:
+  - Accept the collaborator invitation GitHub emailed you, then clone the repo
+  - npm test passes on your machine
+  - Your handle is in CONTRIBUTORS.md on main
+```

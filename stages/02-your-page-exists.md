@@ -25,3 +25,21 @@ Your page is the thing that grows for as long as you contribute, anywhere. This 
 ## If you get stuck
 
 Paste the validate output here. The message tells you what to change; if it does not, that is a bug in Nest and worth an issue of its own.
+
+<!-- Machine-readable summary read by the Kestrel platform. Keep it in step with the text above. -->
+
+```kestrel-ticket
+stage: 2
+reserved_for: {{handle}}
+cohort: {{cohort}}
+evidence: practice
+title: {{stage_title}}
+steps:
+  - Fill in profile.yml and page.md in your directory
+  - Run nest validate until it reports no problems
+  - Set visibility.page to public
+  - Open a pull request; it merges on its own when CI is green
+done_when:
+  - nest validate reports no problems
+  - Your page is live at the site
+```

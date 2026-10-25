@@ -21,3 +21,20 @@ Review is half of open-source work, and the half most people are never taught. I
 ## If you get stuck
 
 If there is no open pull request to review, say so here; a maintainer will point you at one, possibly in shared code. If a review you received felt unkind, see CODE_OF_CONDUCT.md and tell a maintainer.
+
+<!-- Machine-readable summary read by the Kestrel platform. Keep it in step with the text above. -->
+
+```kestrel-ticket
+stage: 6
+reserved_for: {{handle}}
+cohort: {{cohort}}
+evidence: review
+title: {{stage_title}}
+steps:
+  - Review a peer pull request with at least one line comment and a verdict
+  - Ask a peer to review one of yours
+  - Answer every comment they leave
+done_when:
+  - You reviewed a peer pull request that has merged
+  - A peer reviewed one of yours
+```

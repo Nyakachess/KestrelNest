@@ -25,3 +25,21 @@ Everything so far happened in your own directory, where only you are affected. S
 ## If you get stuck
 
 Comment on the issue you claimed, not here. If the issue itself turned out to be wrong or unclear, say that: fixing the issue text is also a contribution.
+
+<!-- Machine-readable summary read by the Kestrel platform. Keep it in step with the text above. -->
+
+```kestrel-ticket
+stage: 5
+reserved_for: {{handle}}
+cohort: {{cohort}}
+evidence: shared_project
+title: {{stage_title}}
+steps:
+  - Claim an issue labelled good-shared-issue
+  - Reproduce the problem before changing anything
+  - Make the change with a test and open a pull request
+  - Answer every review comment
+done_when:
+  - Your change to shared code is merged after review
+  - Every acceptance criterion was checked
+```

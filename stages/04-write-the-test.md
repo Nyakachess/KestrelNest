@@ -29,3 +29,21 @@ A fix without a test is a fix that can come back. In Stage 3 you found something
 ## If you get stuck
 
 Paste your test and the output here. Common snags: forgetting `await` is not needed here (everything is synchronous), or asserting the fix instead of the rule behind it.
+
+<!-- Machine-readable summary read by the Kestrel platform. Keep it in step with the text above. -->
+
+```kestrel-ticket
+stage: 4
+reserved_for: {{handle}}
+cohort: {{cohort}}
+evidence: practice
+title: {{stage_title}}
+steps:
+  - Add a test to profile.test.ts that asserts the rule behind your Stage 3 defect
+  - Put the defect back and watch the test fail
+  - Remove the defect and watch it pass
+  - Open a pull request with both outputs
+done_when:
+  - The test fails with the defect and passes without it
+  - The test is merged and runs in CI
+```
