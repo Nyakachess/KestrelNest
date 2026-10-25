@@ -17,6 +17,7 @@ Rules:
 - `id` must match the directory name.
 - `members` are GitHub logins in lower case, each listed once.
 - A contributor's `profile.yml` must name a cohort that exists here, once any cohort exists.
+- `defect_tier` is optional: 1 (the default), 2 or 3, the tier of planted defect this cohort's scaffolds draw from (ADR 0009). Scaffolding records each planted defect in `.defects.json` next to `cohort.yml`, a local file git ignores, so no two members get the same one while the tier has another.
 
 Opening a cohort is one command once the file is merged:
 

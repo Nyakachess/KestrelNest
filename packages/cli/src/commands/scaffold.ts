@@ -2,7 +2,9 @@ import { existsSync, mkdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { CONTRIBUTORS_DIR, explainHandle, isTemplateDir, listCohortIds, validateCohort } from '@nest/schema'
 import { UsageError } from '../args.js'
-import { BANK, defectByNumberOrId, pickDefect, type Defect } from '../defects.js'
+import { chooseDefect, recordAssigned } from '../defect-bank/selection.js'
+import type { Tier } from '../defect-bank/types.js'
+import { BANK, defectByNumberOrId, type Defect } from '../defects.js'
 import { NO_COHORT } from '../issue-body.js'
 import type { RepoConfig } from '../root.js'
 import { defaultPlan, renderAll, type ScaffoldFiles } from '../templates.js'
@@ -26,13 +28,14 @@ export type ScaffoldResult = {
   defect: Defect | null
   /** The cohort id, or null for an individual joiner. */
   cohort: string | null
+  /** Whether cohorts/<id>/ exists, so the planted defect can be recorded there. */
+  cohortExists: boolean
 }
 
-function resolveCohort(
-  config: RepoConfig,
-  wanted: string | undefined,
-): { id: string | null; starts: string | undefined } {
-  if (wanted === NO_COHORT) return { id: null, starts: undefined }
+type ResolvedCohort = { id: string | null; starts: string | undefined; tier: Tier; exists: boolean }
+
+function resolveCohort(config: RepoConfig, wanted: string | undefined): ResolvedCohort {
+  if (wanted === NO_COHORT) return { id: null, starts: undefined, tier: 1, exists: false }
   const ids = listCohortIds(config.root)
   if (wanted === undefined) {
     if (ids.length === 1) wanted = ids[0]
@@ -43,8 +46,9 @@ function resolveCohort(
     else throw new UsageError(`Several cohorts exist (${ids.join(', ')}). Pass --cohort <id>.`)
   }
   const id = wanted as string
-  if (!ids.includes(id)) return { id, starts: undefined }
-  return { id, starts: validateCohort(config.root, id).cohort?.starts }
+  if (!ids.includes(id)) return { id, starts: undefined, tier: 1, exists: false }
+  const cohort = validateCohort(config.root, id).cohort
+  return { id, starts: cohort?.starts, tier: (cohort?.defect_tier ?? 1) as Tier, exists: true }
 }
 
 /** Builds the files for a contributor directory without touching the disk. */
@@ -64,7 +68,7 @@ export function planScaffold(config: RepoConfig, opts: ScaffoldOptions): Scaffol
 
   let defect: Defect | null = null
   if (template || opts.defect === 'none') defect = null
-  else if (opts.defect === undefined) defect = pickDefect(handle, cohort.id === null)
+  else if (opts.defect === undefined) defect = chooseDefect(config.root, handle, cohort)
   else {
     defect = defectByNumberOrId(opts.defect) ?? null
     if (!defect)
@@ -77,6 +81,7 @@ export function planScaffold(config: RepoConfig, opts: ScaffoldOptions): Scaffol
     files: renderAll(plan, config.repoUrl),
     defect,
     cohort: cohort.id,
+    cohortExists: cohort.exists,
   }
 }
 
@@ -88,5 +93,8 @@ export function scaffold(config: RepoConfig, opts: ScaffoldOptions): ScaffoldRes
   }
   mkdirSync(result.dir, { recursive: true })
   for (const [name, content] of Object.entries(result.files)) writeFileSync(join(result.dir, name), content)
+  // ADR 0009: the cohort's record of planted defects, so the next scaffold picks another
+  if (result.defect && result.cohort !== null && result.cohortExists)
+    recordAssigned(config.root, result.cohort, opts.handle, result.defect.id)
   return result
 }

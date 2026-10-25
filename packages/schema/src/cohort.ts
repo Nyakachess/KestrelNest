@@ -7,6 +7,8 @@ export const CohortSchema = z.strictObject({
   starts: z.iso.date(),
   ends: z.iso.date(),
   members: z.array(z.string().trim().min(1)).max(200),
+  /** The planted-defect tier for this cohort's scaffolds, 1 easy to 3 hard (ADR 0009). Default 1. */
+  defect_tier: z.number().int().min(1).max(3).optional(),
 })
 
 export type Cohort = z.infer<typeof CohortSchema>

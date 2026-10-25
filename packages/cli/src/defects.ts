@@ -121,15 +121,29 @@ export function defectByNumberOrId(value: string): Defect | undefined {
   return BANK.find((d) => d.id === value || String(d.number) === value)
 }
 
+export type PickOptions = {
+  /** The tier the cohort asks for (ADR 0009). Default 1. A tier with no defect falls back to all. */
+  tier?: Tier
+  /** Ids already planted in the cohort: skipped while the tier has another. */
+  used?: ReadonlySet<string>
+  bank?: readonly Defect[]
+}
+
 /**
  * The same handle always gets the same defect, so a re-run of the scaffold is reproducible.
- * Without a cohort, only defects that can be found without one are eligible.
+ * Without a cohort, only defects that can be found without one are eligible. Within those, the
+ * cohort's tier, and within the tier the ones not used yet in the cohort (ADR 0009).
  */
-export function pickDefect(handle: string, cohortless = false): Defect {
-  const eligible = cohortless ? DEFECTS.filter((d) => !d.needsCohort) : [...DEFECTS]
+export function pickDefect(handle: string, cohortless = false, opts: PickOptions = {}): Defect {
+  const bank = opts.bank ?? BANK
+  const eligible = cohortless ? bank.filter((d) => !d.needsCohort) : [...bank]
+  const inTier = eligible.filter((d) => d.tier === (opts.tier ?? 1))
+  const tier = inTier.length > 0 ? inTier : eligible
+  const fresh = opts.used ? tier.filter((d) => !opts.used!.has(d.id)) : tier
+  const pool = fresh.length > 0 ? fresh : tier
   let hash = 0
   for (const ch of handle) hash = (hash * 31 + ch.charCodeAt(0)) >>> 0
-  return eligible[hash % eligible.length] as Defect
+  return pool[hash % pool.length] as Defect
 }
 
 /** Runs every detector. A clean directory returns an empty list. */
