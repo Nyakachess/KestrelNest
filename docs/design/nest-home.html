@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nest: a starter project that grows with you</title>
+<meta name="description" content="Nest is Kestrel Collective's open-source onboarding project. Every new contributor builds a portfolio page here through real pull requests, and it keeps growing with every verified contribution they make anywhere.">
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=clash-display@500,600,700&f[]=satoshi@400,500,700&display=swap">
+<style>
+/* Kestrel Collective: shared styles for the landing page and Nest.
+   Brand: teal #0E5450, orange #E8622C, paper #FAFAF6. Clash Display for headings, Satoshi for body. */
+
+:root {
+  --teal: #0E5450;
+  --teal-deep: #093734;
+  --teal-soft: #EAF2F0;
+  --teal-mint: #9FD9CF;
+  --teal-mid: #569289;
+  --orange: #E8622C;
+  --orange-ink: #B3401E;
+  --orange-soft: #FBEDE5;
+  --paper: #FAFAF6;
+  --card: #FFFFFF;
+  --ink: #17211F;
+  --ink-2: #39504C;
+  --muted: #5E6B68;
+  --line: #E3E1D8;
+  --line-dash: #B9C4C1;
+  --green: #2E7D5B;
+  --green-soft: #E7F3EC;
+  --grey-marker: #8FA19D;
+  --radius: 14px;
+  --font-head: 'Clash Display', 'Space Grotesk', system-ui, sans-serif;
+  --font-body: 'Satoshi', 'Instrument Sans', system-ui, sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  --gutter: clamp(18px, 4vw, 56px);
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.55; }
+a { color: var(--teal); }
+a:hover { color: var(--teal-deep); }
+:focus-visible { outline: 3px solid var(--orange); outline-offset: 2px; border-radius: 4px; }
+img, svg { display: inline-block; vertical-align: middle; }
+h1, h2, h3 { font-family: var(--font-head); font-weight: 700; line-height: 1.1; margin: 0; letter-spacing: -0.01em; }
+h1 { font-size: clamp(34px, 4.6vw, 56px); line-height: 1.04; }
+h2 { font-size: clamp(24px, 3vw, 34px); line-height: 1.12; }
+h3 { font-size: 18px; font-weight: 600; }
+p { margin: 0; }
+
+.skip-link { position: absolute; left: -9999px; top: 0; z-index: 100; background: var(--teal-deep); color: #fff; padding: 10px 18px; border-radius: 0 0 10px 0; font-weight: 700; }
+.skip-link:focus { left: 0; }
+
+.wrap { max-width: 1200px; margin: 0 auto; }
+.wrap-narrow { max-width: 1040px; margin: 0 auto; }
+.section { padding: 48px var(--gutter); }
+.section-hero { padding: 76px var(--gutter) 56px; }
+@media (max-width: 700px) { .section { padding: 36px 16px; } .section-hero { padding: 36px 16px 28px; } }
+
+.eyebrow { display: inline-block; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--teal); background: var(--teal-soft); border-radius: 999px; padding: 5px 12px; }
+.label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--teal); }
+.label-muted { color: var(--muted); }
+.mono { font-family: var(--font-mono); }
+.muted { color: var(--muted); }
+.ink2 { color: var(--ink-2); }
+.small { font-size: 12.5px; }
+.lead { font-size: 18px; line-height: 1.55; color: var(--ink-2); }
+@media (max-width: 700px) { .lead { font-size: 15.5px; } }
+
+.btn { display: inline-block; text-decoration: none; border-radius: 999px; padding: 13px 24px; font-size: 15px; font-weight: 700; border: 1px solid transparent; cursor: pointer; font-family: inherit; line-height: 1.2; min-height: 44px; }
+.btn-primary { background: var(--teal); color: #fff; border-color: var(--teal); }
+.btn-primary:hover { background: var(--teal-deep); color: #fff; }
+.btn-secondary { background: var(--card); color: var(--ink); border-color: var(--line); }
+.btn-secondary:hover { border-color: var(--teal); color: var(--ink); }
+.btn-outline { background: transparent; color: var(--teal); border-color: var(--teal); }
+.btn-outline:hover { background: var(--teal-soft); color: var(--teal-deep); }
+.btn-light { background: #fff; color: var(--teal-deep); border-color: #fff; }
+.btn-ghost-light { background: transparent; color: #fff; border-color: var(--teal-mint); }
+.btn-sm { padding: 9px 18px; font-size: 13px; }
+.btn-block { display: block; width: 100%; text-align: center; }
+
+.card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; }
+.card-tight { padding: 18px; }
+.card-dark { background: var(--teal-deep); border-color: var(--teal-deep); color: #EAF2F0; }
+.card-dark h3, .card-dark .strong { color: #fff; }
+.card-dark .soft { color: #D6E8E4; }
+.card-dark .label { color: var(--teal-mint); }
+.card-soft { background: var(--teal-soft); border-color: var(--teal); }
+.card-soft, .card-soft p { color: var(--teal-deep); }
+.card-dashed { border-style: dashed; }
+.card-link { display: block; text-decoration: none; color: inherit; transition: transform .15s ease, box-shadow .15s ease; }
+.card-link:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(14,84,80,.10); color: inherit; }
+.rule-top { border-top: 3px solid var(--teal); padding-top: 14px; }
+
+.chip { display: inline-block; font-family: var(--font-mono); font-size: 10px; color: var(--muted); background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 2px 8px; }
+.chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.pill { display: inline-block; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 700; border-radius: 999px; padding: 3px 9px; }
+.pill-teal { color: var(--teal); background: var(--teal-soft); }
+.pill-grey { color: var(--ink-2); background: var(--paper); border: 1px solid var(--line); }
+.pill-green { color: var(--green); background: var(--green-soft); }
+.pill-orange { color: var(--orange-ink); background: var(--orange-soft); }
+.pill-dashed { color: var(--muted); background: #fff; border: 1px dashed var(--line-dash); font-weight: 400; text-transform: none; letter-spacing: 0; }
+
+.marker { display: inline-block; width: 10px; height: 10px; border-radius: 999px; vertical-align: middle; margin-right: 6px; }
+.marker-external { background: var(--green); }
+.marker-shared { background: var(--teal); }
+.marker-practice { background: #fff; border: 1.5px solid var(--grey-marker); }
+.legend { display: flex; gap: 14px; flex-wrap: wrap; font-family: var(--font-mono); font-size: 10.5px; color: var(--muted); }
+
+.grid { display: grid; gap: 14px; }
+.grid-12 { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 40px; align-items: start; }
+.grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.grid-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.grid-7 { grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 10px; }
+.span-3 { grid-column: span 3; } .span-4 { grid-column: span 4; } .span-5 { grid-column: span 5; }
+.span-6 { grid-column: span 6; } .span-7 { grid-column: span 7; } .span-8 { grid-column: span 8; }
+.center { align-items: center; }
+@media (max-width: 1000px) {
+  .grid-12 { grid-template-columns: 1fr; gap: 24px; }
+  .span-3, .span-4, .span-5, .span-6, .span-7, .span-8 { grid-column: auto; }
+  .grid-4, .grid-5, .grid-7 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 600px) {
+  .grid-2, .grid-3, .grid-4, .grid-5 { grid-template-columns: 1fr; }
+  .grid-7 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+.stack { display: flex; flex-direction: column; gap: 12px; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.between { justify-content: space-between; }
+.mt-1 { margin-top: 8px; } .mt-2 { margin-top: 14px; } .mt-3 { margin-top: 22px; } .mt-4 { margin-top: 28px; } .mt-5 { margin-top: 36px; }
+.mb-2 { margin-bottom: 14px; }
+.divider { border-top: 1px dashed var(--line); }
+
+/* Site header with a no-JavaScript mobile menu */
+.site-header { background: rgba(250,250,246,0.96); border-bottom: 1px solid var(--line); padding: 14px var(--gutter); position: sticky; top: 0; z-index: 10; backdrop-filter: blur(6px); }
+.site-header .wrap { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+.brand { text-decoration: none; font-family: var(--font-head); font-weight: 700; font-size: 19px; color: var(--teal); }
+.brand .accent { color: var(--orange); }
+.brand small { font-family: var(--font-mono); font-size: 10.5px; color: var(--muted); font-weight: 400; margin-left: 8px; }
+.site-nav { display: flex; gap: 22px; flex-wrap: wrap; }
+.site-nav a { font-size: 13.5px; font-weight: 600; text-decoration: none; color: var(--ink-2); }
+.site-nav a:hover, .site-nav a[aria-current="page"] { color: var(--teal); }
+.header-actions { margin-left: auto; display: flex; gap: 8px; }
+.menu-toggle { display: none; }
+@media (max-width: 900px) {
+  .site-header .wrap { gap: 12px; }
+  .menu-toggle { display: block; margin-left: auto; }
+  .menu-toggle summary { list-style: none; cursor: pointer; width: 44px; height: 44px; border: 1px solid var(--line); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+  .menu-toggle summary::-webkit-details-marker { display: none; }
+  .menu-toggle .menu { position: absolute; left: 0; right: 0; top: 100%; background: var(--card); border-bottom: 1px solid var(--line); padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+  .site-nav, .header-actions { display: none; }
+  .menu-toggle .menu a { font-size: 15px; font-weight: 600; text-decoration: none; color: var(--ink-2); padding: 8px 0; }
+  .menu-toggle .menu .btn { text-align: center; }
+}
+
+.site-footer { border-top: 1px solid var(--line); padding: 28px var(--gutter); }
+.site-footer .wrap { display: flex; gap: 24px; flex-wrap: wrap; align-items: center; }
+.site-footer nav { display: flex; gap: 18px; flex-wrap: wrap; font-size: 12.5px; }
+.site-footer nav a { text-decoration: none; color: var(--ink-2); }
+.site-footer .legal { margin-left: auto; display: flex; gap: 14px; flex-wrap: wrap; font-family: var(--font-mono); font-size: 10.5px; color: var(--muted); }
+.site-footer .legal a { color: var(--muted); }
+
+/* Forms */
+.field label { display: block; font-size: 12.5px; font-weight: 600; margin-bottom: 6px; }
+.field input, .field select, .field textarea { width: 100%; font-family: inherit; font-size: 14px; background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 11px 13px; color: var(--ink); }
+.field textarea { resize: vertical; }
+.form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.form-grid .full { grid-column: 1 / -1; }
+@media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
+
+/* Evidence record card and level meters */
+.meter { display: flex; gap: 3px; }
+.meter span { flex: 1; height: 6px; border-radius: 4px; background: var(--teal-soft); }
+.meter span.on { background: var(--teal); }
+.evidence-row { display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px dashed var(--line); font-size: 13px; }
+.evidence-row:last-child { border-bottom: 0; }
+.evidence-row .marker { flex: none; margin-top: 5px; }
+.evidence-row .meta { font-family: var(--font-mono); font-size: 10.5px; color: var(--muted); margin-top: 2px; }
+
+/* Avatars and people cards */
+.avatar { width: 44px; height: 44px; border-radius: 999px; color: #fff; display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-weight: 600; flex: none; }
+.avatar-lg { width: 88px; height: 88px; font-size: 28px; }
+.person-card { display: flex; flex-direction: column; gap: 8px; }
+.person-card .counts { margin-top: auto; font-family: var(--font-mono); font-size: 10.5px; color: var(--muted); }
+
+/* Ladder */
+.ladder { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+.ladder .step { border-radius: 10px; padding: 10px 12px; font-size: 11.5px; background: var(--card); border: 1px solid var(--line); }
+.ladder .step .n { font-family: var(--font-mono); font-size: 9.5px; color: var(--muted); }
+.ladder .step .t { font-weight: 700; margin-top: 2px; }
+.ladder .step.done { background: var(--teal); border-color: var(--teal); color: #fff; }
+.ladder .step.done .n { color: rgba(255,255,255,0.8); }
+.ladder .step.todo { border-style: dashed; border-color: var(--line-dash); color: var(--muted); }
+.ladder .step.highlight { background: var(--teal-soft); border-color: var(--teal); }
+@media (max-width: 900px) { .ladder { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (max-width: 600px) { .ladder { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+.stat { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+.stat .k { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.stat .v { font-family: var(--font-head); font-weight: 700; font-size: 24px; margin-top: 4px; }
+.stat .s { font-size: 11px; color: var(--muted); }
+
+.code-panel { background: var(--teal-deep); border-radius: 16px; padding: 22px; color: #EAF2F0; font-family: var(--font-mono); font-size: 12px; line-height: 1.75; }
+.code-panel .k { color: var(--teal-mint); }
+.code-panel .hd { color: var(--teal-mint); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 10px; }
+.code-panel .ft { margin-top: 14px; border-top: 1px dashed #2F6B66; padding-top: 10px; color: #D6E8E4; font-size: 11px; }
+
+.shadow { box-shadow: 0 18px 40px rgba(14,84,80,0.08); }
+.step-num { font-family: var(--font-mono); font-size: 11px; font-weight: 700; color: var(--orange); }
+.card-dark .step-num { color: #F2A17E; }
+.check { display: flex; align-items: center; gap: 6px; }
+.check svg { flex: none; }
+
+</style>
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<header class="site-header">
+  <div class="wrap">
+    <a href="/" class="brand">Nest <small>by Kestrel Collective</small></a>
+    <nav class="site-nav" aria-label="Site">
+      <a href="nest-cohort.html">Cohorts</a>
+      <a href="https://github.com/kestrel-collective/nest/blob/main/docs/roadmap.md">Roadmap</a>
+      <a href="https://github.com/kestrel-collective/nest/blob/main/docs/CONTRIBUTING.md">Contributing</a>
+    </nav>
+    <div class="header-actions">
+      <a href="https://github.com/kestrel-collective/nest" class="btn btn-outline btn-sm">GitHub &#8599;</a>
+    </div>
+    <details class="menu-toggle">
+      <summary aria-label="Open menu"><svg aria-hidden="true" width="18" height="14" viewBox="0 0 18 14"><path d="M1 1h16M1 7h16M1 13h16" stroke="#0E5450" stroke-width="2"/></svg></summary>
+      <div class="menu">
+        <a href="nest-cohort.html">Cohorts</a>
+        <a href="https://github.com/kestrel-collective/nest/blob/main/docs/roadmap.md">Roadmap</a>
+        <a href="https://github.com/kestrel-collective/nest/blob/main/docs/CONTRIBUTING.md">Contributing</a>
+        <a href="https://github.com/kestrel-collective/nest" class="btn btn-outline btn-sm">GitHub &#8599;</a>
+      </div>
+    </details>
+  </div>
+</header>
+
+<main id="main">
+  <section class="section-hero">
+    <div class="wrap grid-12 center">
+      <div class="span-7">
+        <span class="eyebrow">A starter project that grows with you</span>
+        <h1 class="mt-2" style="font-size: clamp(32px, 4vw, 44px)">Your first open-source contributions, in a codebase built for them.</h1>
+        <p class="lead mt-3" style="max-width: 54ch; font-size: 16px">Nest is a real, maintained open-source project. Every new Kestrel contributor gets a page here that they build themselves, pull request by pull request, and that keeps growing with every verified contribution they make anywhere.</p>
+        <div class="row mt-4">
+          <a href="https://github.com/kestrel-collective/nest/issues?q=label%3Astage%3A1" class="btn btn-primary">Start with Stage 1</a>
+          <a href="nest-profile.html" class="btn btn-secondary">See a learner's page</a>
+        </div>
+        <div class="row mt-4 mono muted" style="gap: 22px; font-size: 11px">
+          <span><b style="color: var(--ink); font-size: 15px">143</b> contributor pages</span>
+          <span><b style="color: var(--ink); font-size: 15px">61</b> shared-code PRs merged</span>
+          <span><b style="color: var(--ink); font-size: 15px">v1.4</b> latest release</span>
+        </div>
+      </div>
+      <div class="span-5 code-panel" aria-label="Example profile file">
+        <div class="hd">contributors/amara-otieno/profile.yml</div>
+        <div><span class="k">handle:</span> amara-otieno</div>
+        <div><span class="k">name:</span> Amara Otieno</div>
+        <div><span class="k">cohort:</span> 2027-01</div>
+        <div><span class="k">skills_developing:</span></div>
+        <div style="padding-left: 14px">- debugging</div>
+        <div style="padding-left: 14px">- pytest</div>
+        <div style="padding-left: 14px">- reading unfamiliar code</div>
+        <div><span class="k">next:</span> Automated testing, supported level.</div>
+        <div class="ft">&#10003; validate-profiles · &#10003; build · preview deployed</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top: 20px">
+    <div class="wrap">
+      <div class="label mb-2">The ladder · an invitation, not a gate</div>
+      <div class="ladder">
+        <div class="step"><div class="n">Stage 1</div><div class="t">Make it run</div><div class="muted" style="font-size: 11.5px; margin-top: 4px">Clone, test, first PR</div></div>
+        <div class="step"><div class="n">Stage 2</div><div class="t">Your page exists</div><div class="muted" style="font-size: 11.5px; margin-top: 4px">Profile, preview, live</div></div>
+        <div class="step"><div class="n">Stage 3</div><div class="t">Fix your defect</div><div class="muted" style="font-size: 11.5px; margin-top: 4px">Reproduce, hypothesise, fix</div></div>
+        <div class="step"><div class="n">Stage 4</div><div class="t">Write the test</div><div class="muted" style="font-size: 11.5px; margin-top: 4px">Fails before, passes after</div></div>
+        <div class="step highlight"><div class="n" style="color: var(--teal)">Stage 5</div><div class="t" style="color: var(--teal-deep)">Ship to shared code</div><div class="ink2" style="font-size: 11.5px; margin-top: 4px">Real issue, real review</div></div>
+        <div class="step"><div class="n">Stage 6</div><div class="t">Review a peer</div><div class="muted" style="font-size: 11.5px; margin-top: 4px">Both sides of review</div></div>
+        <div class="step"><div class="n">Stage 7</div><div class="t">Propose something</div><div class="muted" style="font-size: 11.5px; margin-top: 4px">Then: any repo you like</div></div>
+      </div>
+      <p class="muted mt-2" style="font-size: 12.5px">Experienced already? Skip to Stage 5 or straight to the Kestrel board. Nothing here is required for anything else.</p>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top: 20px">
+    <div class="wrap">
+      <div class="row between mb-2">
+        <div class="label">Recent pages · cohort 2027-01</div>
+        <a href="nest-cohort.html" style="font-size: 12.5px; font-weight: 700">All cohorts &#8594;</a>
+      </div>
+      <div class="grid grid-4">
+        <a href="nest-profile.html" class="card card-tight card-link person-card">
+          <div class="avatar" style="background: var(--teal)" aria-hidden="true">AO</div>
+          <div style="font-weight: 700; font-size: 15px">Amara Otieno</div>
+          <div class="muted" style="font-size: 12.5px">Python developer learning to work in codebases I did not write.</div>
+          <div class="counts"><span class="pill pill-green">3 external</span> <span class="pill pill-teal">1 shared</span></div>
+        </a>
+        <a href="#" class="card card-tight card-link person-card">
+          <div class="avatar" style="background: var(--teal-mid)" aria-hidden="true">DK</div>
+          <div style="font-weight: 700; font-size: 15px">Daniel Kiprop</div>
+          <div class="muted" style="font-size: 12.5px">TypeScript, accessibility fixes, learning to test what I ship.</div>
+          <div class="counts"><span class="pill pill-green">1 external</span> <span class="pill pill-teal">2 shared</span></div>
+        </a>
+        <a href="#" class="card card-tight card-link person-card">
+          <div class="avatar" style="background: var(--orange)" aria-hidden="true">FW</div>
+          <div style="font-weight: 700; font-size: 15px">Faith Wanjiru</div>
+          <div class="muted" style="font-size: 12.5px">Documentation first, then the code that the docs describe.</div>
+          <div class="counts"><span class="pill pill-dashed">Stage 3 of 7</span></div>
+        </a>
+        <a href="#" class="card card-tight card-link person-card">
+          <div class="avatar" style="background: var(--teal-deep)" aria-hidden="true">PM</div>
+          <div style="font-weight: 700; font-size: 15px">Peter Mwangi</div>
+          <div class="muted" style="font-size: 12.5px">Returning to code after four years in operations.</div>
+          <div class="counts"><span class="pill pill-dashed">Stage 2 of 7</span></div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top: 20px; padding-bottom: 64px">
+    <div class="wrap grid grid-3">
+      <div class="card"><div class="label">A real project</div><p class="ink2 mt-1" style="font-size: 13px">CI on every PR, previews, CODEOWNERS, ADRs, a public roadmap and quarterly releases. The same workflow you will meet everywhere else.</p></div>
+      <div class="card"><div class="label">Evidence, labelled honestly</div><p class="ink2 mt-1" style="font-size: 13px">Pages separate practice in your own directory, contributions to Nest's shared code, and work accepted by other projects. Nothing is dressed up as more than it is.</p></div>
+      <div class="card"><div class="label">Yours, for good</div><p class="ink2 mt-1" style="font-size: 13px">Publish what you choose, edit forever, unpublish with one PR. Your page keeps growing after onboarding ends, from verified work, wherever you do it.</p></div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span class="mono muted" style="font-size: 10.5px">kestrel-collective/nest · MIT</span>
+    <div class="legal" style="margin-left: 0">
+      <a href="https://github.com/kestrel-collective/nest/blob/main/docs/PRIVACY.md">Privacy</a><a href="https://github.com/kestrel-collective/nest/blob/main/CHANGELOG.md">Changelog v1.4</a><a href="https://www.kestrelcollective.org">Kestrel Collective</a>
+    </div>
+  </div>
+</footer>
+</body>
+</html>
