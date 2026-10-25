@@ -83,22 +83,30 @@ export class GhCli implements Gh {
     }
   }
 
+  /**
+   * Titles of the person's issues: those assigned to them, and the onboarding issues whose
+   * title names them. The second set matters because stage issues are created while the
+   * invitation is still pending and GitHub drops the assignee, so a re-run that looked only
+   * at assignees would open every stage issue a second time.
+   */
   listIssueTitles(assignee: string): string[] {
-    const args = [
-      'issue',
-      'list',
-      '--repo',
-      this.slug,
-      '--assignee',
-      assignee,
-      '--state',
-      'all',
-      '--limit',
-      '500',
-      '--json',
-      'title',
-    ]
-    return this.ghJson(args).map((i) => i.title ?? '')
+    const list = (filter: string[]) =>
+      this.ghJson([
+        'issue',
+        'list',
+        '--repo',
+        this.slug,
+        ...filter,
+        '--state',
+        'all',
+        '--limit',
+        '500',
+        '--json',
+        'title',
+      ]).map((i) => i.title ?? '')
+    const mine = `(@${assignee.toLowerCase()})`
+    const named = list(['--label', 'onboarding']).filter((t) => t.toLowerCase().endsWith(mine))
+    return [...new Set([...list(['--assignee', assignee]), ...named])]
   }
 
   findPr(branch: string): string | null {
