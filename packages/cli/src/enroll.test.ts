@@ -102,4 +102,17 @@ describe('enroll', () => {
     expect(profile).not.toMatch(/^cohort:/m)
     expect(validateContributor(config.root, 'test-three').issues).toEqual([])
   })
+
+  it('enrols someone as an individual joiner when their cohort is not opened yet', () => {
+    const config = tempRepo({ '.github/CODEOWNERS': OWNERS })
+    const gh = new FakeGh()
+    const io = collectIo()
+    const r = enroll(config, opts({ cohort: '2031-07' }), gh, io)
+    expect(r.cohort).toBe('none')
+    expect(outcomes(r)).toEqual(['a:skipped', 'b:created', 'c:created', 'd:created'])
+    expect(gh.filePrs.size).toBe(0)
+    expect(gh.issues.some((i) => i.labels.includes('cohort:2031-07'))).toBe(false)
+    expect(io.lines.join(' ')).toContain('cohorts/2031-07/cohort.yml does not exist yet')
+    expect(io.lines.join(' ')).toContain('open-cohort 2031-07')
+  })
 })

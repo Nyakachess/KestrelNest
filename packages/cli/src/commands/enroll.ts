@@ -68,14 +68,19 @@ export function enroll(config: RepoConfig, opts: EnrollOptions, gh: Gh, io: Io):
   const handle = opts.handle.toLowerCase()
   const why = explainHandle(handle)
   if (why) throw new UsageError(`The handle ${why}`)
-  const cohort = opts.cohort
+  let cohort = opts.cohort
   if (cohort !== NO_COHORT) {
     if (!isCohortId(cohort))
       throw new UsageError(`The cohort must be a year and month like 2027-01, or "none", not "${cohort}".`)
     if (!existsSync(join(config.root, COHORTS_DIR, cohort, COHORT_FILE))) {
-      throw new UsageError(
-        `cohorts/${cohort}/${COHORT_FILE} does not exist. Create and merge it first, or pass --cohort none.`,
+      // The platform may enrol someone into a cohort this repository has not opened yet. They are
+      // not held back: they start as an individual joiner, and open-cohort adds them to the cohort
+      // once its file is merged.
+      io.out(
+        `cohorts/${cohort}/${COHORT_FILE} does not exist yet, so @${handle} is enrolled as an individual joiner; ` +
+          `run open-cohort ${cohort} once the cohort file is merged to add them to it.`,
       )
+      cohort = NO_COHORT
     }
   }
 
@@ -92,7 +97,7 @@ export function enroll(config: RepoConfig, opts: EnrollOptions, gh: Gh, io: Io):
   }
   const ctx: EnrollContext = {
     config,
-    opts: { ...opts, handle },
+    opts: { ...opts, handle, cohort },
     gh,
     io,
     report,
