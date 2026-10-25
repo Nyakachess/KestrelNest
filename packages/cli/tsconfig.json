@@ -2,6 +2,11 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": { "composite": true, "rootDir": "src", "outDir": "dist" },
   "include": ["src"],
-  "exclude": ["src/**/*.test.ts", "src/test-support.ts"],
+  "exclude": [
+    "src/**/*.test.ts",
+    "src/test-support.ts",
+    "src/defect-bank/test-fixtures.ts",
+    "src/defects/candidates"
+  ],
   "references": [{ "path": "../schema" }]
 }

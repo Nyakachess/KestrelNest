@@ -1,4 +1,5 @@
 import { flagBool, flagString, parseArgs, UsageError } from './args.js'
+import { runDefectImport } from './commands/defect-import.js'
 import { runDefectRequest } from './commands/defect-request.js'
 import { enroll, type EnrollMode } from './commands/enroll.js'
 import { runFeed } from './commands/feed.js'
@@ -30,6 +31,7 @@ Usage: nest <command> [options]
       [--gh] [--dry-run]
   defect-request --round <n>       Write the request file for a round of candidate defects (P2).
       [--count <n>] [--out <file>]
+  defect-import <runner-output>    Write the runner's acceptable outputs as candidate defects.
 
 Every command accepts --root <dir>. Without it the repository is found from the current directory.
 --dry-run prints what would happen and makes no GitHub calls. Without --gh the bodies are printed instead.`
@@ -123,6 +125,11 @@ export function main(argv: readonly string[]): number {
         { round, count: count === undefined ? undefined : Number(count), out: flagString(flags, 'out') },
         io,
       )
+    }
+    case 'defect-import': {
+      const file = positionals[0]
+      if (!file) throw new UsageError('defect-import needs the runner output file: nest defect-import <file>')
+      return runDefectImport(config, file, io)
     }
     default:
       throw new UsageError(`Unknown command "${command}". Run nest help to see the commands.`)
