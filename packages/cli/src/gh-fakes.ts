@@ -1,5 +1,15 @@
 import { UsageError } from './args.js'
-import type { CollaboratorState, FilePrResult, FilePrSpec, Gh, IssueSpec, PrSpec, StageIssue } from './gh.js'
+import type {
+  CollaboratorState,
+  FilePrResult,
+  FilePrSpec,
+  Gh,
+  IssueSpec,
+  MainCommitResult,
+  MainCommitSpec,
+  PrSpec,
+  StageIssue,
+} from './gh.js'
 
 type Method = keyof Gh
 
@@ -19,6 +29,13 @@ export class FakeGh implements Gh {
   closedBranches = new Set<string>()
   /** Whether the admin token is present, so invitations can be read and cancelled. */
   adminToken = true
+  /** Files on main, and every commit the bot made to it. */
+  main = new Map<string, string>()
+  commits: { message: string; files: Record<string, string> }[] = []
+  /** When set, someone else commits these files to main just before the bot's next commit lands. */
+  raceOnNextCommit: Record<string, string> | null = null
+  /** When true, main refuses the bot's commits as a protected branch would. */
+  protectedMain = false
   calls: string[] = []
   private counter = 0
   private failures = new Map<Method, number>()
@@ -104,6 +121,29 @@ export class FakeGh implements Gh {
     }
   }
 
+  commitToMain(spec: MainCommitSpec): MainCommitResult {
+    this.record('commitToMain', spec.message)
+    for (let attempt = 1; attempt <= 5; attempt++) {
+      const read = (path: string) => this.main.get(path) ?? null
+      const changed = Object.entries(spec.edit(read)).filter(([path, text]) => read(path) !== text)
+      if (changed.length === 0) return { action: 'unchanged', sha: null, paths: [] }
+      if (this.protectedMain) {
+        const err = new Error('main is protected against the workflow (fake protected branch).')
+        ;(err as Error & { retryable?: boolean }).retryable = false
+        throw err
+      }
+      if (this.raceOnNextCommit) {
+        for (const [path, text] of Object.entries(this.raceOnNextCommit)) this.main.set(path, text)
+        this.raceOnNextCommit = null
+        continue // main moved: the edit runs again on the newer main
+      }
+      for (const [path, text] of changed) this.main.set(path, text)
+      this.commits.push({ message: spec.message, files: Object.fromEntries(changed) })
+      return { action: 'committed', sha: `fake-${this.commits.length}`, paths: changed.map(([path]) => path) }
+    }
+    throw new Error('main kept moving')
+  }
+
   collaboratorState(handle: string): CollaboratorState {
     this.record('collaboratorState', handle)
     const h = handle.toLowerCase()
@@ -178,6 +218,9 @@ export class NullGh implements Gh {
     throw new UsageError(NOT_INSTALLED)
   }
   upsertFilePr(): never {
+    throw new UsageError(NOT_INSTALLED)
+  }
+  commitToMain(): never {
     throw new UsageError(NOT_INSTALLED)
   }
   collaboratorState(): CollaboratorState {

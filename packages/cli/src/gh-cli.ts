@@ -2,7 +2,17 @@ import { execFileSync, type ExecFileSyncOptionsWithStringEncoding } from 'node:c
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { UsageError } from './args.js'
-import type { CollaboratorState, FilePrResult, FilePrSpec, Gh, IssueSpec, PrSpec, StageIssue } from './gh.js'
+import type {
+  CollaboratorState,
+  FilePrResult,
+  FilePrSpec,
+  Gh,
+  IssueSpec,
+  MainCommitResult,
+  MainCommitSpec,
+  PrSpec,
+  StageIssue,
+} from './gh.js'
 
 type Json = {
   title?: string
@@ -13,6 +23,9 @@ type Json = {
   id?: number
   invitee?: { login?: string }
 }[]
+
+/** How often a commit to main is tried again when main moved underneath it. */
+const MAIN_ATTEMPTS = 5
 
 /** The real thing, through the GitHub CLI and git. */
 export class GhCli implements Gh {
@@ -372,6 +385,67 @@ export class GhCli implements Gh {
     return this.adminToken !== ''
   }
 
+  /**
+   * One commit on top of main through the git data API, then a fast-forward-only move of main.
+   * Nothing touches the working tree. When main moved in between, GitHub refuses the move and
+   * the edit runs again on the newest main, so concurrent changes to one file both land instead
+   * of conflicting. A protected main is explained and not retried.
+   */
+  commitToMain(spec: MainCommitSpec): MainCommitResult {
+    const api = (args: string[], body?: unknown) =>
+      JSON.parse(
+        this.gh(
+          ['api', ...args, ...(body === undefined ? [] : ['--input', '-'])],
+          body === undefined ? undefined : JSON.stringify(body),
+        ) || '{}',
+      ) as Record<string, unknown>
+    for (let attempt = 1; attempt <= MAIN_ATTEMPTS; attempt++) {
+      const head = (api([`repos/${this.slug}/git/ref/heads/main`]).object as { sha: string }).sha
+      const baseTree = (api([`repos/${this.slug}/git/commits/${head}`]).tree as { sha: string }).sha
+      const cache = new Map<string, string | null>()
+      const read = (path: string): string | null => {
+        if (!cache.has(path)) cache.set(path, this.readAt(head, path))
+        return cache.get(path) ?? null
+      }
+      const changed = Object.entries(spec.edit(read)).filter(([path, text]) => read(path) !== text)
+      if (changed.length === 0) return { action: 'unchanged', sha: head, paths: [] }
+      const tree = api(['-X', 'POST', `repos/${this.slug}/git/trees`], {
+        base_tree: baseTree,
+        tree: changed.map(([path, content]) => ({ path, mode: '100644', type: 'blob', content })),
+      }).sha as string
+      const commit = api(['-X', 'POST', `repos/${this.slug}/git/commits`], {
+        message: spec.message,
+        tree,
+        parents: [head],
+      }).sha as string
+      try {
+        api(['-X', 'PATCH', `repos/${this.slug}/git/refs/heads/main`], { sha: commit, force: false })
+        return { action: 'committed', sha: commit, paths: changed.map(([path]) => path) }
+      } catch (e) {
+        const text = e instanceof Error ? e.message : String(e)
+        if (/not a fast.?forward/i.test(text) && attempt < MAIN_ATTEMPTS) continue
+        throw explainProtectedMain(e)
+      }
+    }
+    throw new Error(`main kept moving; gave up after ${MAIN_ATTEMPTS} attempts`)
+  }
+
+  /** The text of a file on main at a commit, or null when it does not exist there. */
+  private readAt(sha: string, path: string): string | null {
+    try {
+      const file = JSON.parse(
+        this.gh([
+          'api',
+          `repos/${this.slug}/contents/${path.split('/').map(encodeURIComponent).join('/')}?ref=${sha}`,
+        ]),
+      ) as { content?: string; encoding?: string }
+      return Buffer.from(file.content ?? '', (file.encoding as BufferEncoding) ?? 'base64').toString('utf8')
+    } catch (e) {
+      if (/HTTP 404|Not Found/i.test(e instanceof Error ? e.message : String(e))) return null
+      throw e
+    }
+  }
+
   cancelInvitation(handle: string): 'cancelled' | 'none' {
     const invited = JSON.parse(
       this.asAdmin(['api', `repos/${this.slug}/invitations?per_page=100`, '--paginate']) || '[]',
@@ -396,6 +470,24 @@ export function explainPrRefusal(e: unknown): unknown {
       'Actions to create and approve pull requests" in the organisation settings (Actions, General, ' +
       'Workflow permissions) and then in the repository settings, or set the NEST_BOT_TOKEN secret ' +
       '(see docs/ENROLMENT.md).',
+  )
+  ;(err as Error & { retryable?: boolean }).retryable = false
+  return err
+}
+
+/**
+ * A commit straight to main fails when main is protected against the workflow. That is a
+ * setting, so the error names it and is not retried; the step fails instead of falling back to
+ * a pull request a maintainer would have to merge.
+ */
+export function explainProtectedMain(e: unknown): unknown {
+  const text = e instanceof Error ? e.message : String(e)
+  if (!/protected (branch|ref)|branch protection|repository rule|rule violations?/i.test(text)) return e
+  const err = new Error(
+    'main is protected against the workflow, so the bot cannot commit cohort files to it. In the ' +
+      "repository's settings (Rules or Branches), let github-actions bypass the rule for main, or turn off " +
+      '"Require a pull request before merging" for it. GitHub said: ' +
+      text,
   )
   ;(err as Error & { retryable?: boolean }).retryable = false
   return err

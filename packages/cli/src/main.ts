@@ -6,6 +6,7 @@ import { runDefectRequest } from './commands/defect-request.js'
 import { enroll, type EnrollMode } from './commands/enroll.js'
 import { runFeed } from './commands/feed.js'
 import { runNewTask } from './commands/new-task.js'
+import { cohortOpen } from './commands/cohort-open.js'
 import { openCohort } from './commands/open-cohort.js'
 import { scaffold } from './commands/scaffold.js'
 import { runValidate } from './commands/validate.js'
@@ -32,6 +33,8 @@ Usage: nest <command> [options]
       --name "<Name>" --cohort <id|none> [--gh] [--dry-run]
   open-cohort <id>                 Enrol every member of a cohort.
       [--gh] [--dry-run]
+  cohort-open <id>                 Create cohorts/<id>/cohort.yml on main for a cohort the platform opened.
+      --name "<Name>" --starts YYYY-MM-DD --ends YYYY-MM-DD [--gh] [--dry-run]
   withdraw <handle>                Close and rename the person's stage issues and close their open
       [--gh] [--dry-run]           pull requests, so a new enrolment starts them afresh.
   defect-request --round <n>       Write the request file for a round of candidate defects (P2).
@@ -120,6 +123,23 @@ export function main(argv: readonly string[]): number | Promise<number> {
       const handle = positionals[0]
       if (!handle) throw new UsageError('withdraw needs a handle: nest withdraw <handle>')
       const report = withdraw({ handle, mode }, ghFor(config, mode), io)
+      return report.failed ? 1 : 0
+    }
+    case 'cohort-open': {
+      const id = positionals[0]
+      if (!id)
+        throw new UsageError('cohort-open needs a cohort id: nest cohort-open <id> --name "<Name>" ...')
+      const report = cohortOpen(
+        {
+          id,
+          name: flagString(flags, 'name'),
+          starts: flagString(flags, 'starts'),
+          ends: flagString(flags, 'ends'),
+          mode,
+        },
+        ghFor(config, mode),
+        io,
+      )
       return report.failed ? 1 : 0
     }
     case 'open-cohort': {

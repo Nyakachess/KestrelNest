@@ -19,6 +19,14 @@ Rules:
 - A contributor's `profile.yml` must name a cohort that exists here, once any cohort exists.
 - `defect_tier` is optional: 1 (the default), 2 or 3, the tier of planted defect this cohort's scaffolds draw from (ADR 0009). Scaffolding records each planted defect in `.defects.json` next to `cohort.yml`, a local file git ignores, so no two members get the same one while the tier has another.
 
+Kestrel opens a cohort every two weeks. It sends a `repository_dispatch` of type `cohort`, and the Cohort workflow writes `cohorts/<id>/cohort.yml` with no members and commits it to `main` as the bot, with no pull request:
+
+```
+{ "event_type": "cohort", "client_payload": { "id": "2027-01-12", "name": "Cohort starting 12 January 2027", "starts": "2027-01-12", "ends": "2028-01-12" } }
+```
+
+By hand: `npx nest cohort-open 2027-01-12 --name "Cohort starting 12 January 2027" --starts 2027-01-12 --ends 2028-01-12 --gh`. An existing file is left as it is.
+
 Opening a cohort is one command once the file is merged:
 
 ```bash

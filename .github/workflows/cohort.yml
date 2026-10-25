@@ -1,0 +1,57 @@
+name: Cohort
+
+# Kestrel opens a cohort every two weeks and sends a repository_dispatch of type "cohort" with
+# client_payload { id, name, starts, ends }: id is the start date as YYYY-MM-DD, the dates are
+# YYYY-MM-DD. This writes cohorts/<id>/cohort.yml with no members and commits it to main as the
+# bot, with no pull request; members are added as they enrol. An existing file is left alone.
+# A maintainer can run it from the Actions tab with the same four inputs.
+on:
+  repository_dispatch:
+    types: [cohort]
+  workflow_dispatch:
+    inputs:
+      id:
+        description: Cohort id, its start date as YYYY-MM-DD (or YYYY-MM)
+        required: true
+        type: string
+      name:
+        description: Display name
+        required: true
+        type: string
+      starts:
+        description: Start date, YYYY-MM-DD
+        required: true
+        type: string
+      ends:
+        description: End date, YYYY-MM-DD
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: cohort-${{ github.event.client_payload.id || inputs.id }}
+  cancel-in-progress: false
+
+jobs:
+  open:
+    runs-on: ubuntu-latest
+    env:
+      ID: ${{ github.event.client_payload.id || inputs.id }}
+      NAME: ${{ github.event.client_payload.name || inputs.name }}
+      STARTS: ${{ github.event.client_payload.starts || inputs.starts }}
+      ENDS: ${{ github.event.client_payload.ends || inputs.ends }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Build the CLI
+        run: npx tsc -b
+      - name: Open the cohort
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node packages/cli/bin/nest.js cohort-open "$ID" --name "$NAME" --starts "$STARTS" --ends "$ENDS" --gh

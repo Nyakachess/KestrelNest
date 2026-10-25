@@ -15,6 +15,16 @@ export type PrSpec = {
 }
 export type FilePrSpec = { branch: string; title: string; body: string; files: Record<string, string> }
 export type FilePrResult = { url: string; action: 'created' | 'updated' | 'unchanged' }
+/**
+ * A commit straight to main by the bot. `edit` gets the text of a path on main (null when the
+ * path does not exist there) and returns the files to write. It runs again against the newest
+ * main whenever main moved in between, so two enrolments into one cohort both land.
+ */
+export type MainCommitSpec = {
+  message: string
+  edit: (read: (path: string) => string | null) => Record<string, string>
+}
+export type MainCommitResult = { action: 'committed' | 'unchanged'; sha: string | null; paths: string[] }
 export type CollaboratorState = 'collaborator' | 'invited' | 'none'
 /** A personal stage issue: labelled onboarding, its title ending "(@handle)". */
 export type StageIssue = { number: number; title: string; state: 'open' | 'closed' }
@@ -33,6 +43,8 @@ export interface Gh {
   createDraftPr(spec: PrSpec): string
   /** Makes the branch hold exactly these files on top of main, pushes it, and opens a PR if none exists. */
   upsertFilePr(spec: FilePrSpec): FilePrResult
+  /** Commits the edited files to main as the bot, with no pull request; see MainCommitSpec. */
+  commitToMain(spec: MainCommitSpec): MainCommitResult
   collaboratorState(handle: string): CollaboratorState
   inviteCollaborator(handle: string, permission: 'push'): void
   /** Onboarding issues, open or closed, whose title ends "(@handle)", case-insensitive. */
