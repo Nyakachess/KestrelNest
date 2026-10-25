@@ -22,4 +22,4 @@ One line per step: what was done, what was skipped, and any decision the guide d
 - The GitHub remote of this clone is `Nyakachess/KestrelNest`, not `kestrel-collective/nest`. The repo slug is read from the root `package.json` `repository` field everywhere, so changing it is one edit.
 
 ## Steps
-
+- Step 0, repo skeleton: npm workspaces (`packages/schema`, `packages/cli`), TypeScript project references built by `tsc -b` on install, vitest, prettier, `scripts/check-dashes.mjs`, MIT license, README, `.gitattributes` forcing LF. Checks: `npm install`, `npm run build`, `npm test` (no tests yet), `npm run lint` pass; `npx nest --version` prints 0.1.0. Decisions: Astro 5.18 because Astro 6 and later need Node 22 and the rule is Node 20; vitest 3.2 because npm 10.2 on this machine crashes resolving vitest 4's optional peers; TypeScript 5.9 rather than the 7.x native compiler. The repo slug and site URL live in the root `package.json` `repository` and `homepage` fields and nowhere else. Skipped: nothing.

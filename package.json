@@ -1,0 +1,30 @@
+{
+  "name": "@kestrel-collective/nest",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Kestrel Collective's open-source onboarding project",
+  "license": "MIT",
+  "repository": "github:kestrel-collective/nest",
+  "homepage": "https://nest.kestrelcollective.org",
+  "type": "module",
+  "engines": {
+    "node": ">=20.3.0"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "test": "vitest run",
+    "typecheck": "tsc -b --dry",
+    "lint": "prettier --check . && node scripts/check-dashes.mjs",
+    "format": "prettier --write .",
+    "prepare": "tsc -b"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "prettier": "^3.6.0",
+    "typescript": "~5.9.3",
+    "vitest": "^3.2.0"
+  }
+}
