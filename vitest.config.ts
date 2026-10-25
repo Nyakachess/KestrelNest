@@ -8,7 +8,12 @@ export default defineConfig({
     },
   },
   test: {
-    include: ['packages/**/*.test.ts', 'site/**/*.test.ts', 'scripts/**/*.test.ts'],
+    include: [
+      'packages/**/*.test.ts',
+      'site/**/*.test.ts',
+      'scripts/**/*.test.ts',
+      'contributors/**/*.test.ts',
+    ],
     passWithNoTests: true,
   },
 })

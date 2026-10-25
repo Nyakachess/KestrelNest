@@ -1,4 +1,10 @@
-import { formatIssue, validateRepo, type ValidationIssue } from '@nest/schema'
+import {
+  formatIssue,
+  listCohortIds,
+  listContributorDirs,
+  validateRepo,
+  type ValidationIssue,
+} from '@nest/schema'
 import type { Io } from '../io.js'
 import type { RepoConfig } from '../root.js'
 
@@ -13,10 +19,11 @@ export function sortIssues(issues: readonly ValidationIssue[]): ValidationIssue[
 export function runValidate(config: RepoConfig, io: Io): number {
   const result = validateRepo(config.root)
   for (const issue of sortIssues(result.issues)) io.err(formatIssue(issue))
-  const dirs = result.contributors.length
-  const templates = result.contributors.filter((c) => c.isTemplate).length
-  const people = dirs - templates
-  const what = `${people} contributor director${people === 1 ? 'y' : 'ies'}, ${templates} template${templates === 1 ? '' : 's'} and ${result.cohorts.length} cohort${result.cohorts.length === 1 ? '' : 's'}`
+  const dirs = listContributorDirs(config.root)
+  const templates = dirs.filter((d) => d.startsWith('_')).length
+  const cohorts = listCohortIds(config.root).length
+  const people = dirs.length - templates
+  const what = `${people} contributor director${people === 1 ? 'y' : 'ies'}, ${templates} template${templates === 1 ? '' : 's'} and ${cohorts} cohort${cohorts === 1 ? '' : 's'}`
   if (result.issues.length === 0) {
     io.out(`Checked ${what}: no problems.`)
     return 0
