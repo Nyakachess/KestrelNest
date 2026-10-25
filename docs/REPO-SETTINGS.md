@@ -58,6 +58,6 @@ None. Every workflow uses the built-in `GITHUB_TOKEN`. Cloudflare Pages deploys 
 ## Enrolment
 
 - [ ] Settings, Actions, General, "Workflow permissions": tick "Allow GitHub Actions to create and approve pull requests". Without it the Enrol workflow cannot open the scaffold and cohort pull requests.
-- [ ] Give Kestrel a fine-grained token with repository access to `KestrelNest` only and Contents read and write, stored on the Kestrel side as `NEST_DISPATCH_TOKEN` with `NEST_REPO=Nyakachess/KestrelNest`.
+- [ ] Give Kestrel a fine-grained token with repository access to `nest` only and Contents read and write, stored on the Kestrel side as `NEST_DISPATCH_TOKEN` with `NEST_REPO=kestrel-collective/nest`.
 - [ ] Optional: a second fine-grained token with Contents, Pull requests and Issues read and write as the repository secret `NEST_BOT_TOKEN`, so bot pull requests get CI and auto-merge (see docs/ENROLMENT.md).
 - [ ] Run the Enrol workflow once by hand with a test handle you control, check the scaffold pull request, the invitation and the six issues, then delete them.

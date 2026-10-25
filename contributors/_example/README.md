@@ -11,4 +11,4 @@ What is here and what to do with it:
 
 Before you push: `npm run validate` tells you the file, the line and the field of anything that needs changing. To see your page, run `npm run dev` and open http://localhost:4321/p/_example/ (once it is public).
 
-Your issues, in order: https://github.com/Nyakachess/KestrelNest/issues?q=is%3Aopen+assignee%3A_example+label%3Aonboarding
+Your issues, in order: https://github.com/kestrel-collective/nest/issues?q=is%3Aopen+assignee%3A_example+label%3Aonboarding

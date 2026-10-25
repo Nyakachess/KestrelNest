@@ -9,8 +9,8 @@ The site is published at https://nest.kestrelcollective.org.
 You need Git and Node 20 or newer (`node --version` to check). Then:
 
 ```bash
-git clone https://github.com/Nyakachess/KestrelNest.git
-cd KestrelNest
+git clone https://github.com/kestrel-collective/nest.git
+cd nest
 npm install
 npm test
 ```

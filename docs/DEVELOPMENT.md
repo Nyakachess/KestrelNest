@@ -11,8 +11,8 @@ How to get Nest running on your own machine and see it in a browser. For the fir
 ## Setup
 
 ```bash
-git clone https://github.com/Nyakachess/KestrelNest.git
-cd KestrelNest
+git clone https://github.com/kestrel-collective/nest.git
+cd nest
 npm install
 npm test
 ```

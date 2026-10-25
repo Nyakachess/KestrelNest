@@ -18,7 +18,7 @@ Every GitHub call is retried three times with exponential backoff, waiting for t
 Kestrel sends a `repository_dispatch` event to this repository:
 
 ```
-POST https://api.github.com/repos/Nyakachess/KestrelNest/dispatches
+POST https://api.github.com/repos/kestrel-collective/nest/dispatches
 { "event_type": "enroll", "client_payload": { "handle": "a-login", "name": "Display Name", "cohort": "2027-01" } }
 ```
 

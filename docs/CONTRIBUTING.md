@@ -38,7 +38,7 @@ And one norm: asking never costs you anything. A question on your stage issue is
 If you are a cohort member you have write access and can push branches directly. Otherwise fork the repository first (the Fork button on GitHub) and clone your fork instead.
 
 ```bash
-git clone https://github.com/Nyakachess/KestrelNest.git
+git clone https://github.com/kestrel-collective/nest.git
 cd nest
 npm install
 npm test
