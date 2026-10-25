@@ -43,7 +43,7 @@ Without `--gh` or `--dry-run` the command prints the pull request bodies and the
 
 A week after enrolment with no commit from them, the Onboarding workflow leaves one comment, ever, on their Stage 1 issue with those two steps.
 
-Their stage issues are created while the invitation is still pending, and GitHub drops an assignee who has no access yet. Every half hour the Onboarding workflow's `stage-upkeep` job assigns each open, unassigned stage issue to its owner once they are a collaborator. Kestrel only reserves a stage ticket for the issue's assignee, so the tickets appear on their board after they accept.
+Their stage issues are created while the invitation is still pending, and GitHub drops an assignee who has no access yet. Every half hour (or at once on a `repository_dispatch` of type `upkeep`) the Onboarding workflow's `stage-upkeep` job assigns each open, unassigned stage issue to its owner once they are a collaborator.
 
 ## The invitation token
 
@@ -57,7 +57,12 @@ Run the workflow or the command again for the same handle. Steps that are done a
 
 Every stage issue ends with a fenced `kestrel-ticket` block that Kestrel reads to create a ticket on the person's board. Kestrel validates it strictly (its decision D-38), so the block has exactly these keys: `competency` (a rubric slug: debugging, automated-testing or technical-communication), `level` (guided, supported or independent), `difficulty` (starter, standard or stretch), `kp` (0 to 3), `evidence_kind` (practice, shared_project or proposal), `reserved_for` (the handle, or null for a shared issue), `stage`, `steps` (1 to 8, each with `title` and `guide`), `acceptance_criteria` (1 to 8 sentences) and `resources` (0 to 5 https URLs). The text above the block is for people; the block is for the platform. Keep them in step.
 
-When a template's block changes, run the Onboarding workflow by hand with **refresh blocks** ticked: it puts the current block into every open stage issue created from an older one.
+When a template's block changes, nothing needs to be run by hand: every half hour the Onboarding workflow's `stage-upkeep` job puts the current block into every open stage issue created from an older one, and leaves current ones untouched. Kestrel can also start that job at once with a `repository_dispatch` of type `upkeep`:
+
+```
+POST https://api.github.com/repos/kestrel-collective/nest/dispatches
+{ "event_type": "upkeep" }
+```
 
 ## Two limits worth knowing
 

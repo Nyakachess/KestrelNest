@@ -2,8 +2,9 @@
 //   1. assign each open, unassigned stage issue to its owner once they are a collaborator
 //      (enrolment creates the issues while the invitation is pending, and GitHub drops an
 //      assignee who has no access yet; Kestrel only reserves a ticket for the assignee);
-//   2. with REFRESH_BLOCKS=true, put the current kestrel-ticket block from stages/ into
-//      every open stage issue whose block differs (after a template change).
+//   2. on every run, put the current kestrel-ticket block from stages/ into every open stage
+//      issue whose block differs, so a template change reaches Kestrel with nobody running
+//      anything by hand.
 import { execFileSync } from 'node:child_process'
 import { readdirSync, readFileSync } from 'node:fs'
 import {
@@ -69,18 +70,20 @@ for (const { number, handle } of issuesToAssign(issues, isCollaborator)) {
   console.log(`Assigned #${number} to @${handle}`)
 }
 
-if (process.env.REFRESH_BLOCKS === 'true') {
-  const templates = new Map()
-  for (const name of readdirSync('stages').filter((n) => /^\d\d-.*\.md$/.test(n)))
-    templates.set(Number(name.slice(0, 2)), templateBlock(readFileSync(`stages/${name}`, 'utf8')))
-  for (const issue of issues) {
-    const stage = stageOf(issue.labels)
-    const handle = handleFromTitle(issue.title)
-    const block = stage === null ? null : templates.get(stage)
-    if (!block || !handle) continue
-    const body = refreshBody(issue.body, renderBlock(block, { handle, repoUrl }))
-    if (body === null) continue
-    gh(['issue', 'edit', String(issue.number), '--repo', repo, '--body-file', '-'], body)
-    console.log(`Refreshed the kestrel-ticket block on #${issue.number}`)
-  }
+// Every run: an issue whose block is already current is left untouched, so this is cheap
+const templates = new Map()
+for (const name of readdirSync('stages').filter((n) => /^\d\d-.*\.md$/.test(n)))
+  templates.set(Number(name.slice(0, 2)), templateBlock(readFileSync(`stages/${name}`, 'utf8')))
+let refreshed = 0
+for (const issue of issues) {
+  const stage = stageOf(issue.labels)
+  const handle = handleFromTitle(issue.title)
+  const block = stage === null ? null : templates.get(stage)
+  if (!block || !handle) continue
+  const body = refreshBody(issue.body, renderBlock(block, { handle, repoUrl }))
+  if (body === null) continue
+  gh(['issue', 'edit', String(issue.number), '--repo', repo, '--body-file', '-'], body)
+  console.log(`Refreshed the kestrel-ticket block on #${issue.number}`)
+  refreshed += 1
 }
+console.log(`${issues.length} open stage issue(s) checked, ${refreshed} block(s) refreshed`)

@@ -3,22 +3,18 @@ name: Onboarding
 # Scheduled upkeep of the ladder.
 # - Daily: one nudge, ever, on a Stage 1 issue that has sat for a week with no commit from
 #   its assignee.
-# - Every half hour: assign open stage issues to their owner once the owner has accepted the
-#   collaborator invitation. Enrolment creates the issues while the invitation is pending,
-#   GitHub drops an assignee who has no access yet, and Kestrel only reserves a stage ticket
-#   for the issue's assignee. Run by hand with "refresh blocks" to put the current
-#   kestrel-ticket block from stages/ into issues created from an older one.
+# - Every half hour, and whenever Kestrel sends a repository_dispatch of type "upkeep":
+#   assign open stage issues to their owner once the owner has accepted the collaborator
+#   invitation (enrolment creates the issues while the invitation is pending, and GitHub drops
+#   an assignee who has no access yet), and put the current kestrel-ticket block from stages/
+#   into every open stage issue whose block is out of date. Nobody has to remember to refresh.
 on:
   schedule:
     - cron: '23 7 * * *'
     - cron: '7,37 * * * *'
+  repository_dispatch:
+    types: [upkeep]
   workflow_dispatch:
-    inputs:
-      refresh_blocks:
-        description: Also replace each open stage issue's kestrel-ticket block with the current template's
-        required: false
-        type: boolean
-        default: false
 
 permissions:
   contents: read
@@ -53,8 +49,7 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
-      - name: Assign stage issues, and refresh their blocks when asked
+      - name: Assign stage issues and refresh their blocks
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REFRESH_BLOCKS: ${{ inputs.refresh_blocks && 'true' || 'false' }}
         run: node .github/scripts/stage-upkeep.mjs
