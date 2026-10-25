@@ -75,7 +75,8 @@ export class GhCli implements Gh {
       const files = dirty
         .split('\n')
         .slice(0, 10)
-        .map((l) => l.slice(3))
+        // "XY path"; git() trims the output, so the first line may have lost its leading space
+        .map((l) => l.trim().replace(/^\S+\s+/, ''))
         .join(', ')
       throw new UsageError(
         `The working tree has uncommitted changes (${files}). Commit or stash them before opening pull requests.`,
