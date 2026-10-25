@@ -43,7 +43,7 @@ export const cohortYml = (members: string[], id = '2027-01'): string =>
     'name: January 2027 cohort',
     'starts: 2027-01-12',
     'ends: 2027-04-30',
-    'members:',
+    members.length === 0 ? 'members: []' : 'members:',
     ...members.map((m) => `  - ${m}`),
     '',
   ].join('\n')
