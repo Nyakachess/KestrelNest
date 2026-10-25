@@ -6,7 +6,7 @@ How a person gets their directory, their invitation and their stage issues with 
 
 `nest enroll <handle> --name "<Name>" --cohort <id|none>` performs four idempotent steps and prints one line per step (created, updated, skipped or failed):
 
-- a. Cohort files: the handle is added to `cohorts/<id>/cohort.yml` and `/contributors/<handle>/ @<handle>` to `.github/CODEOWNERS`, through one pull request from `bot/enroll-<handle>` titled `chore(cohort): add @<handle> to <id>`. Skipped when the cohort is `none`.
+- a. Cohort files: the handle is added to `cohorts/<id>/cohort.yml` and `/contributors/<handle>/ @<handle>` to `.github/CODEOWNERS` in one commit straight to `main` by the bot, `chore(cohort): add @<handle> to <id>`, with no pull request for a maintainer to merge. The edit is made against the newest `main`, so two people enrolled at once both land. Skipped when the cohort is `none`, and when the cohort file does not exist yet (the person is enrolled as an individual joiner and `open-cohort` adds them later).
 - b. Scaffold: if `contributors/<handle>/` is not on `main` and no pull request exists from `scaffold/<handle>`, the directory is scaffolded with its planted defect and a draft pull request "Scaffold for @<handle>" is opened, assigned to the person, with the body from `.github/PR_TEMPLATE_SCAFFOLD.md`.
 - c. Invitation: the handle is invited as a collaborator with push permission, unless already a collaborator or already invited.
 - d. Stage issues: stages 1, 2, 3, 4, 6 and 7, labelled `onboarding`, `stage:<n>` and `cohort:<id>` when there is one, assigned to the person, in the cohort milestone. Any title that already exists, open or closed, is skipped.
@@ -53,7 +53,7 @@ The workflow's own token is not allowed to read or send repository invitations (
 
 ## The pull request setting
 
-The scaffold pull request (step b) and a cohort's file pull request (step a) are opened with the workflow's own token, which GitHub refuses unless pull requests from Actions are allowed. Once, as an owner: in the organisation's settings, Actions, General, Workflow permissions, tick "Allow GitHub Actions to create and approve pull requests"; then tick the same box in this repository's settings. Without it step b fails with a message naming this setting, and is not retried. A `NEST_BOT_TOKEN` secret (below) is the alternative.
+The scaffold pull request (step b) is opened with the workflow's own token, which GitHub refuses unless pull requests from Actions are allowed. Once, as an owner: in the organisation's settings, Actions, General, Workflow permissions, tick "Allow GitHub Actions to create and approve pull requests"; then tick the same box in this repository's settings. Without it step b fails with a message naming this setting, and is not retried. A `NEST_BOT_TOKEN` secret (below) is the alternative.
 
 ## Re-running safely
 
@@ -67,7 +67,7 @@ Use it when a person leaves before finishing, or to start someone again from Sta
 
 - closes the person's open stage issues as not planned, with one comment saying a new enrolment opens fresh ones;
 - renames every stage issue of theirs, open or closed, by appending ` [withdrawn YYYY-MM-DD]`, so the title no longer ends `(@handle)`: enrolment and the Onboarding upkeep no longer see it, and Kestrel withdraws a ticket whose issue is closed as not planned;
-- closes an open pull request from `scaffold/<handle>` or `bot/enroll-<handle>`;
+- closes an open pull request from `scaffold/<handle>`, or from `bot/enroll-<handle>` left by an enrolment from before membership was committed to `main`;
 - cancels a pending invitation, when the `NEST_ADMIN_TOKEN` secret is there (otherwise it says it left the invitation as it is).
 
 It leaves in place, on purpose: collaborator access, the person's `contributors/<handle>/` directory and their `CONTRIBUTORS.md` line. A second run finds nothing to do. Enrol the person again afterwards to open six fresh stage issues.
@@ -83,7 +83,8 @@ POST https://api.github.com/repos/kestrel-collective/nest/dispatches
 { "event_type": "upkeep" }
 ```
 
-## Two limits worth knowing
+## Limits worth knowing
 
-- Pull requests created with the workflow's own token do not trigger workflows, so the bot's cohort pull request does not get CI or auto-merge until a maintainer pushes to it or closes and reopens it. Setting a fine-grained token with Contents, Pull requests and Issues write as the repository secret `NEST_BOT_TOKEN` and using it in `enroll.yml` lifts that limit.
+- Step a and the Cohort workflow commit straight to `main`. If `main` is protected against the workflow (a rule requiring pull requests, with no bypass for GitHub Actions), they fail with a message naming the rule instead of falling back to a pull request: let `github-actions` bypass the rule for `main`, or turn the rule off for it.
+- Pull requests created with the workflow's own token do not trigger workflows, so the bot's scaffold pull request does not get CI until a maintainer pushes to it or closes and reopens it. Setting a fine-grained token with Contents, Pull requests and Issues write as the repository secret `NEST_BOT_TOKEN` and using it in `enroll.yml` lifts that limit.
 - Individual joiners (`cohort: none`) have no cohort file to change and no milestone; their profile has no `cohort` field until they join one.

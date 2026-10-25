@@ -4,8 +4,6 @@ import { dirname, join } from 'node:path'
 import { UsageError } from './args.js'
 import type {
   CollaboratorState,
-  FilePrResult,
-  FilePrSpec,
   Gh,
   IssueSpec,
   MainCommitResult,
@@ -235,48 +233,6 @@ export class GhCli implements Gh {
       return true
     } catch {
       return false
-    }
-  }
-
-  upsertFilePr(spec: FilePrSpec): FilePrResult {
-    const paths = Object.keys(spec.files)
-    this.requireCleanTree(paths)
-    const original = this.git(['rev-parse', '--abbrev-ref', 'HEAD'])
-    this.git(['fetch', 'origin', 'main'])
-    this.git(['checkout', '-B', spec.branch, 'origin/main'])
-    try {
-      for (const [path, content] of Object.entries(spec.files)) {
-        mkdirSync(dirname(join(this.root, path)), { recursive: true })
-        writeFileSync(join(this.root, path), content)
-      }
-      this.git(['add', '--', ...paths])
-      const existing = this.findPr(spec.branch)
-      if (this.git(['status', '--porcelain', '--', ...paths]) === '') {
-        return { url: existing ?? '', action: 'unchanged' }
-      }
-      this.git(['commit', '-m', spec.title])
-      this.git(['push', '--force-with-lease', '-u', 'origin', spec.branch])
-      if (existing) return { url: existing, action: 'updated' }
-      const url = this.gh(
-        [
-          'pr',
-          'create',
-          '--repo',
-          this.slug,
-          '--head',
-          spec.branch,
-          '--title',
-          spec.title,
-          '--body-file',
-          '-',
-        ],
-        spec.body,
-      )
-      return { url, action: 'created' }
-    } catch (e) {
-      throw explainPrRefusal(e)
-    } finally {
-      this.git(['checkout', original])
     }
   }
 

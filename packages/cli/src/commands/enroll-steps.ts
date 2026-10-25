@@ -5,8 +5,7 @@ import { addCodeownersLine, addCohortMember } from '../enroll-files.js'
 import { fillTemplate, NO_COHORT, renderIssue, templateVars } from '../issue-body.js'
 import { planScaffold, scaffold } from './scaffold.js'
 import {
-  enrollBranch,
-  enrollPrTitle,
+  enrollCommitMessage,
   readRepoFile,
   scaffoldBranch,
   scaffoldPrTitle,
@@ -17,37 +16,51 @@ import { ensureIssueLabels } from './new-task.js'
 const CODEOWNERS = '.github/CODEOWNERS'
 const SCAFFOLD_TEMPLATE = '.github/PR_TEMPLATE_SCAFFOLD.md'
 
-/** a. The handle is in the cohort member list and owns its directory in CODEOWNERS, through one bot PR. */
+/** The cohort file and CODEOWNERS with the handle added; only the files that change. */
+function cohortEdits(
+  read: (path: string) => string | null,
+  cohortPath: string,
+  handle: string,
+): Record<string, string> {
+  const files: Record<string, string> = {}
+  const members = addCohortMember(read(cohortPath) ?? '', handle)
+  const owners = addCodeownersLine(read(CODEOWNERS) ?? '', handle)
+  if (members.changed) files[cohortPath] = members.text
+  if (owners.changed) files[CODEOWNERS] = owners.text
+  return files
+}
+
+/**
+ * a. The handle is in the cohort member list and owns its directory in CODEOWNERS, committed
+ * straight to main by the bot: no pull request, so no maintainer has to merge anything. The
+ * edit is made against the newest main, so two people enrolled at once both land.
+ */
 export function stepCohortFiles(ctx: EnrollContext): void {
   const { config, opts, gh, io, report } = ctx
   const { handle, cohort, mode } = opts
   if (cohort === NO_COHORT) return ctx.done('a', 'skipped', 'no cohort')
   const cohortPath = `${COHORTS_DIR}/${cohort}/${COHORT_FILE}`
-  const members = addCohortMember(readRepoFile(config.root, cohortPath), handle)
-  const owners = addCodeownersLine(readRepoFile(config.root, CODEOWNERS), handle)
-  if (!members.changed && !owners.changed) return ctx.done('a', 'skipped', 'already a member and owner')
-  const files: Record<string, string> = {}
-  if (members.changed) files[cohortPath] = members.text
-  if (owners.changed) files[CODEOWNERS] = owners.text
-  const title = enrollPrTitle(handle, cohort)
-  const body = `Adds @${handle} to cohort ${cohort}: ${Object.keys(files).join(' and ')}. Opened by nest enroll. It merges on its own once CI is green.\n`
-  const changed = Object.keys(files).join(', ')
+  const local = cohortEdits((p) => readRepoFile(config.root, p), cohortPath, handle)
+  if (Object.keys(local).length === 0) return ctx.done('a', 'skipped', 'already a member and owner')
+  const message = enrollCommitMessage(handle, cohort)
+  const changed = Object.keys(local).join(', ')
   if (mode === 'print') {
-    io.out(`# ${title}`)
-    io.out(body.trimEnd())
+    io.out(`# ${message}`)
+    io.out(`Commits ${changed} to main as the bot, with no pull request.`)
     io.out('')
-    return ctx.done('a', 'would create', `PR from ${enrollBranch(handle)} changing ${changed}`)
+    return ctx.done('a', 'would create', `commit on main changing ${changed}`)
   }
   if (mode === 'dry-run')
-    return ctx.done('a', 'would create', `PR "${title}" from ${enrollBranch(handle)} changing ${changed}`)
-  const result = ctx.retry('cohort pull request', () =>
-    gh.upsertFilePr({ branch: enrollBranch(handle), title, body, files }),
+    return ctx.done('a', 'would create', `commit "${message}" on main changing ${changed}`)
+  const result = ctx.retry('cohort files', () =>
+    gh.commitToMain({ message, edit: (read) => cohortEdits(read, cohortPath, handle) }),
   )
-  report.cohortPr = result.url || null
+  report.cohortCommit = result.sha
+  if (result.action === 'unchanged') return ctx.done('a', 'skipped', 'already a member and owner on main')
   ctx.done(
     'a',
-    result.action === 'unchanged' ? 'skipped' : result.action,
-    result.url ? `${result.url} (${changed})` : changed,
+    result.paths.includes(cohortPath) ? 'created' : 'updated',
+    `${result.paths.join(', ')} committed to main (${result.sha ?? ''})`,
   )
 }
 

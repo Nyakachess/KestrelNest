@@ -34,7 +34,7 @@ describe('enroll retries and modes', () => {
     expect(outcomes(r)).toEqual(['a:created', 'b:created', 'c:created', 'd:created'])
     expect(gh.issues).toHaveLength(6)
     expect(count(gh, 'createIssue')).toBe(8)
-    expect(count(gh, 'upsertFilePr')).toBe(1)
+    expect(count(gh, 'commitToMain')).toBe(1)
     expect(count(gh, 'createDraftPr')).toBe(1)
     expect(count(gh, 'inviteCollaborator')).toBe(1)
   })

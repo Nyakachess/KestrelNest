@@ -13,8 +13,6 @@ export type PrSpec = {
   paths: string[]
   assignee?: string | undefined
 }
-export type FilePrSpec = { branch: string; title: string; body: string; files: Record<string, string> }
-export type FilePrResult = { url: string; action: 'created' | 'updated' | 'unchanged' }
 /**
  * A commit straight to main by the bot. `edit` gets the text of a path on main (null when the
  * path does not exist there) and returns the files to write. It runs again against the newest
@@ -41,8 +39,6 @@ export interface Gh {
   createIssue(spec: IssueSpec): string
   /** Commits the paths on a new branch, pushes it, opens a draft PR and returns to the original branch. */
   createDraftPr(spec: PrSpec): string
-  /** Makes the branch hold exactly these files on top of main, pushes it, and opens a PR if none exists. */
-  upsertFilePr(spec: FilePrSpec): FilePrResult
   /** Commits the edited files to main as the bot, with no pull request; see MainCommitSpec. */
   commitToMain(spec: MainCommitSpec): MainCommitResult
   collaboratorState(handle: string): CollaboratorState

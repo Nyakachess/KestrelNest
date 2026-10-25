@@ -1,8 +1,8 @@
+import { existsSync, readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { UsageError } from './args.js'
 import type {
   CollaboratorState,
-  FilePrResult,
-  FilePrSpec,
   Gh,
   IssueSpec,
   MainCommitResult,
@@ -17,7 +17,6 @@ type Method = keyof Gh
 export class FakeGh implements Gh {
   issues: IssueSpec[] = []
   prs: PrSpec[] = []
-  filePrs = new Map<string, FilePrSpec>()
   labels = new Set<string>()
   milestones = new Set<string>()
   collaborators = new Set<string>()
@@ -40,14 +39,19 @@ export class FakeGh implements Gh {
   private counter = 0
   private failures = new Map<Method, number>()
 
+  /** A checkout whose files main starts from, when the test has one. */
+  private readonly root: string | undefined
+
   constructor(
     seed: {
       issueTitles?: Record<string, string[]>
       prBranches?: string[]
       collaborators?: string[]
       invited?: string[]
+      root?: string
     } = {},
   ) {
+    this.root = seed.root
     for (const [assignee, titles] of Object.entries(seed.issueTitles ?? {})) {
       for (const title of titles) this.issues.push({ title, body: '', labels: [], assignee })
     }
@@ -78,8 +82,7 @@ export class FakeGh implements Gh {
 
   findPr(branch: string): string | null {
     this.record('findPr', branch)
-    if (this.prs.some((p) => p.branch === branch) || this.filePrs.has(branch))
-      return `https://example.test/pr/${branch}`
+    if (this.prs.some((p) => p.branch === branch)) return `https://example.test/pr/${branch}`
     return null
   }
 
@@ -109,22 +112,10 @@ export class FakeGh implements Gh {
     return `https://example.test/pr/${spec.branch}`
   }
 
-  upsertFilePr(spec: FilePrSpec): FilePrResult {
-    this.record('upsertFilePr', spec.branch)
-    const existing = this.filePrs.get(spec.branch)
-    this.filePrs.set(spec.branch, spec)
-    const url = `https://example.test/pr/${spec.branch}`
-    if (!existing) return { url, action: 'created' }
-    return {
-      url,
-      action: JSON.stringify(existing.files) === JSON.stringify(spec.files) ? 'unchanged' : 'updated',
-    }
-  }
-
   commitToMain(spec: MainCommitSpec): MainCommitResult {
     this.record('commitToMain', spec.message)
     for (let attempt = 1; attempt <= 5; attempt++) {
-      const read = (path: string) => this.main.get(path) ?? null
+      const read = (path: string) => this.main.get(path) ?? this.fromRoot(path)
       const changed = Object.entries(spec.edit(read)).filter(([path, text]) => read(path) !== text)
       if (changed.length === 0) return { action: 'unchanged', sha: null, paths: [] }
       if (this.protectedMain) {
@@ -142,6 +133,12 @@ export class FakeGh implements Gh {
       return { action: 'committed', sha: `fake-${this.commits.length}`, paths: changed.map(([path]) => path) }
     }
     throw new Error('main kept moving')
+  }
+
+  private fromRoot(path: string): string | null {
+    if (!this.root) return null
+    const file = join(this.root, path)
+    return existsSync(file) ? readFileSync(file, 'utf8') : null
   }
 
   collaboratorState(handle: string): CollaboratorState {
@@ -179,7 +176,7 @@ export class FakeGh implements Gh {
 
   closeOpenPr(branch: string): string | null {
     this.record('closeOpenPr', branch)
-    const exists = this.prs.some((p) => p.branch === branch) || this.filePrs.has(branch)
+    const exists = this.prs.some((p) => p.branch === branch)
     if (!exists || this.closedBranches.has(branch)) return null
     this.closedBranches.add(branch)
     return `https://example.test/pr/${branch}`
@@ -215,9 +212,6 @@ export class NullGh implements Gh {
     throw new UsageError(NOT_INSTALLED)
   }
   createDraftPr(): never {
-    throw new UsageError(NOT_INSTALLED)
-  }
-  upsertFilePr(): never {
     throw new UsageError(NOT_INSTALLED)
   }
   commitToMain(): never {

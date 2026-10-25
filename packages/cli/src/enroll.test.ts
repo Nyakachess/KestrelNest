@@ -27,18 +27,21 @@ const count = (gh: FakeGh, method: string) => gh.calls.filter((c) => c.startsWit
 describe('enroll', () => {
   it('performs steps a to d for a fresh handle', () => {
     const config = tempRepo({ '.github/CODEOWNERS': OWNERS })
-    const gh = new FakeGh()
+    const gh = new FakeGh({ root: config.root })
     const r = enroll(config, opts(), gh, collectIo())
     expect(r.failed).toBe(false)
     expect(outcomes(r)).toEqual(['a:created', 'b:created', 'c:created', 'd:created'])
 
-    const filePr = gh.filePrs.get('bot/enroll-test-three')
-    expect(filePr?.title).toBe('chore(cohort): add @test-three to 2027-01')
-    expect(filePr?.files['cohorts/2027-01/cohort.yml']).toContain(
+    // membership is one bot commit on main, not a pull request a maintainer merges
+    expect(gh.commits).toHaveLength(1)
+    const commit = gh.commits[0]
+    expect(commit?.message).toBe('chore(cohort): add @test-three to 2027-01')
+    expect(commit?.files['cohorts/2027-01/cohort.yml']).toContain(
       '  - test-one\n  - test-three\n  - test-two\n',
     )
-    expect(filePr?.files['.github/CODEOWNERS']).toContain('* @Nyakachess\n')
-    expect(filePr?.files['.github/CODEOWNERS']).toContain('/contributors/test-three/ @test-three')
+    expect(commit?.files['.github/CODEOWNERS']).toContain('* @Nyakachess\n')
+    expect(commit?.files['.github/CODEOWNERS']).toContain('/contributors/test-three/ @test-three')
+    expect(r.cohortCommit).toBe('fake-1')
 
     expect(gh.prs[0]).toMatchObject({
       branch: 'scaffold/test-three',
@@ -93,7 +96,7 @@ describe('enroll', () => {
     const gh = new FakeGh()
     const r = enroll(config, opts({ cohort: 'none' }), gh, collectIo())
     expect(outcomes(r)).toEqual(['a:skipped', 'b:created', 'c:created', 'd:created'])
-    expect(gh.filePrs.size).toBe(0)
+    expect(gh.commits).toHaveLength(0)
     expect(gh.milestones.size).toBe(0)
     expect(
       gh.issues.every((i) => i.milestone === undefined && !i.labels.some((l) => l.startsWith('cohort:'))),
@@ -110,9 +113,35 @@ describe('enroll', () => {
     const r = enroll(config, opts({ cohort: '2031-07' }), gh, io)
     expect(r.cohort).toBe('none')
     expect(outcomes(r)).toEqual(['a:skipped', 'b:created', 'c:created', 'd:created'])
-    expect(gh.filePrs.size).toBe(0)
+    expect(gh.commits).toHaveLength(0)
     expect(gh.issues.some((i) => i.labels.includes('cohort:2031-07'))).toBe(false)
     expect(io.lines.join(' ')).toContain('cohorts/2031-07/cohort.yml does not exist yet')
     expect(io.lines.join(' ')).toContain('open-cohort 2031-07')
+  })
+
+  it('adds two people enrolled at once to the cohort, both', () => {
+    const config = tempRepo({ '.github/CODEOWNERS': OWNERS })
+    const gh = new FakeGh({ root: config.root })
+    // someone else is added to main between this run's read and its commit
+    const cohortPath = 'cohorts/2027-01/cohort.yml'
+    const before = readFileSync(join(config.root, cohortPath), 'utf8')
+    gh.raceOnNextCommit = { [cohortPath]: before.replace('members:\n', 'members:\n  - test-four\n') }
+    const r = enroll(config, opts(), gh, collectIo())
+    expect(outcomes(r)[0]).toBe('a:created')
+    const members = gh.main.get(cohortPath) ?? ''
+    expect(members).toContain('  - test-four\n')
+    expect(members).toContain('  - test-three\n')
+  })
+
+  it('fails step a, naming the rule, when main is protected, and still does the rest', () => {
+    const config = tempRepo({ '.github/CODEOWNERS': OWNERS })
+    const gh = new FakeGh({ root: config.root })
+    gh.protectedMain = true
+    const r = enroll(config, opts(), gh, collectIo())
+    expect(r.failed).toBe(true)
+    expect(outcomes(r)).toEqual(['a:failed', 'b:created', 'c:created', 'd:created'])
+    expect(r.steps[0]?.detail).toMatch(/protected/)
+    expect(gh.calls.filter((c) => c.startsWith('commitToMain '))).toHaveLength(1)
+    expect(gh.prs.map((p) => p.branch)).toEqual(['scaffold/test-three'])
   })
 })

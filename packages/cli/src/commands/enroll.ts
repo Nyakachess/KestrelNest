@@ -34,7 +34,8 @@ export type EnrollReport = {
   issuesCreated: string[]
   issuesSkipped: string[]
   invitation: string
-  cohortPr: string | null
+  /** The commit on main that added the person to their cohort, when one was made. */
+  cohortCommit: string | null
 }
 
 export type EnrollContext = {
@@ -56,8 +57,10 @@ const STEP_LABELS: Record<StepId, string> = {
 
 export const scaffoldBranch = (handle: string) => `scaffold/${handle}`
 export const scaffoldPrTitle = (handle: string) => `Scaffold for @${handle}`
+/** The branch cohort pull requests came from before membership was committed to main; withdraw still closes one. */
 export const enrollBranch = (handle: string) => `bot/enroll-${handle}`
-export const enrollPrTitle = (handle: string, cohort: string) => `chore(cohort): add @${handle} to ${cohort}`
+export const enrollCommitMessage = (handle: string, cohort: string) =>
+  `chore(cohort): add @${handle} to ${cohort}`
 
 /**
  * Enrols one person: cohort files, scaffold pull request, collaborator invitation, personal
@@ -95,7 +98,7 @@ export function enroll(config: RepoConfig, opts: EnrollOptions, gh: Gh, io: Io):
     issuesCreated: [],
     issuesSkipped: [],
     invitation: 'not checked',
-    cohortPr: null,
+    cohortCommit: null,
   }
   const ctx: EnrollContext = {
     config,
