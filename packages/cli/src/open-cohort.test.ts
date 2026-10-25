@@ -84,7 +84,7 @@ describe('open-cohort', () => {
     expect(gh.prs).toEqual([])
     expect(existsSync(join(config.root, 'contributors', 'test-one'))).toBe(false)
     expect(report.issuesCreated).toHaveLength(12)
-    expect(io.lines.filter((l) => l.startsWith('Would ')).length).toBeGreaterThan(12)
+    expect(io.lines.filter((l) => l.startsWith('Would create "Stage ')).length).toBe(12)
     expect(gh.calls.every((c) => c.startsWith('listIssueTitles') || c.startsWith('findPr'))).toBe(true)
   })
 

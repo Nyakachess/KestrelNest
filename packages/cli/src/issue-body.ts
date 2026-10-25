@@ -6,9 +6,13 @@ import type { RepoConfig } from './root.js'
 
 export const STAGES_DIR = 'stages'
 
+/** The word that means "no cohort" on the command line and in cohort placeholders. */
+export const NO_COHORT = 'none'
+
 export type IssueVars = {
   handle: string
   name?: string | undefined
+  /** A cohort id, or NO_COHORT. */
   cohort: string
 }
 
@@ -17,15 +21,20 @@ export type RenderedIssue = {
   title: string
   body: string
   labels: string[]
+  milestone: string | undefined
 }
 
-/** The title every personal stage issue gets. open-cohort uses it to spot issues that already exist. */
+/** The title every personal stage issue gets. Enrolment uses it to spot issues that already exist. */
 export function issueTitle(stage: Stage, handle: string): string {
   return `Stage ${stage.number}: ${stage.title} (@${handle})`
 }
 
+/** onboarding and stage:n always; cohort:<id> only when there is a cohort. */
 export function stageLabels(stage: Stage, cohort: string): string[] {
-  return ['onboarding', `cohort:${cohort}`, `stage:${stage.number}`]
+  const labels = ['onboarding']
+  if (cohort !== NO_COHORT) labels.push(`cohort:${cohort}`)
+  labels.push(`stage:${stage.number}`)
+  return labels
 }
 
 /** Finds stages/0N-*.md for a stage number. */
@@ -43,19 +52,37 @@ export function fillTemplate(text: string, vars: Record<string, string>): string
   return text.replace(/\{\{\s*([a-z_]+)\s*\}\}/g, (match, key: string) => vars[key] ?? match)
 }
 
+export function templateVars(
+  config: RepoConfig,
+  vars: IssueVars,
+  extra: Record<string, string> = {},
+): Record<string, string> {
+  const cohort = vars.cohort
+  return {
+    handle: vars.handle,
+    name: vars.name ?? `@${vars.handle}`,
+    cohort,
+    cohort_phrase: cohort === NO_COHORT ? '' : `, for cohort ${cohort}`,
+    repo: config.slug,
+    repo_url: config.repoUrl,
+    site: config.siteUrl,
+    ...extra,
+  }
+}
+
 export function renderIssue(config: RepoConfig, stageNumber: number, vars: IssueVars): RenderedIssue {
   const stage = stageByNumber(stageNumber)
   if (!stage) throw new UsageError(`Stage must be a number from 1 to 7, not "${stageNumber}".`)
   const template = readFileSync(stageFile(config.root, stage.number), 'utf8')
-  const body = fillTemplate(template, {
-    handle: vars.handle,
-    name: vars.name ?? `@${vars.handle}`,
-    cohort: vars.cohort,
-    repo: config.slug,
-    repo_url: config.repoUrl,
-    site: config.siteUrl,
-    stage_title: stage.title,
-    stage_number: String(stage.number),
-  })
-  return { stage, title: issueTitle(stage, vars.handle), body, labels: stageLabels(stage, vars.cohort) }
+  const body = fillTemplate(
+    template,
+    templateVars(config, vars, { stage_title: stage.title, stage_number: String(stage.number) }),
+  )
+  return {
+    stage,
+    title: issueTitle(stage, vars.handle),
+    body,
+    labels: stageLabels(stage, vars.cohort),
+    milestone: vars.cohort === NO_COHORT ? undefined : vars.cohort,
+  }
 }

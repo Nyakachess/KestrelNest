@@ -34,6 +34,11 @@ export function tempRepo(files: Record<string, string> = {}, opts: { cohort?: bo
     }),
   )
   cpSync(join(REAL_ROOT, 'stages'), join(root, 'stages'), { recursive: true })
+  mkdirSync(join(root, '.github'), { recursive: true })
+  cpSync(
+    join(REAL_ROOT, '.github', 'PR_TEMPLATE_SCAFFOLD.md'),
+    join(root, '.github', 'PR_TEMPLATE_SCAFFOLD.md'),
+  )
   mkdirSync(join(root, 'contributors'), { recursive: true })
   if (opts.cohort !== false) {
     mkdirSync(join(root, 'cohorts', '2027-01'), { recursive: true })
@@ -49,3 +54,15 @@ export function tempRepo(files: Record<string, string> = {}, opts: { cohort?: bo
 export function cleanup(): void {
   for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true })
 }
+
+/** A cohort.yml for the given members. */
+export const cohortYml = (members: string[], id = '2027-01'): string =>
+  [
+    `id: ${id}`,
+    'name: January 2027 cohort',
+    'starts: 2027-01-12',
+    'ends: 2027-04-30',
+    members.length === 0 ? 'members: []' : 'members:',
+    ...members.map((m) => `  - ${m}`),
+    '',
+  ].join('\n')

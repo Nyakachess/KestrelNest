@@ -17,6 +17,8 @@ export type Defect = {
   apply: (plan: ScaffoldPlan) => void
   /** One sentence naming the problem when present, or null. This is what a Stage 4 test asserts. */
   detect: (c: Contributor, cohort: Cohort | undefined) => string | null
+  /** True when the detector needs a cohort, so the defect is never planted for an individual joiner. */
+  needsCohort?: true
 }
 
 const shiftYear = (date: string, years: number) => `${Number(date.slice(0, 4)) + years}${date.slice(4)}`
@@ -30,22 +32,24 @@ export const DEFECTS: readonly Defect[] = [
       plan.joined = shiftYear(plan.joined, 50)
     },
     detect: (c, cohort) => {
-      const limit = cohort ? cohort.ends : `${new Date().getUTCFullYear() + 1}-12-31`
+      const own = cohort && c.profile.cohort === cohort.id ? cohort : undefined
+      const limit = own ? own.ends : `${new Date().getUTCFullYear() + 1}-12-31`
       if (c.profile.joined <= limit) return null
-      return cohort
-        ? `joined is ${c.profile.joined}, after cohort ${cohort.id} ended on ${cohort.ends}.`
+      return own
+        ? `joined is ${c.profile.joined}, after cohort ${own.id} ended on ${own.ends}.`
         : `joined is ${c.profile.joined}, which is in the future.`
     },
   },
   {
     id: 'joined-before-cohort',
     number: 2,
+    needsCohort: true,
     symptom: 'The page says the owner joined a year before their cohort started.',
     apply: (plan) => {
       plan.joined = shiftYear(plan.joined, -1)
     },
     detect: (c, cohort) => {
-      if (!cohort || c.profile.joined >= cohort.starts) return null
+      if (!cohort || c.profile.cohort !== cohort.id || c.profile.joined >= cohort.starts) return null
       return `joined is ${c.profile.joined}, before cohort ${cohort.id} started on ${cohort.starts}.`
     },
   },
@@ -93,11 +97,15 @@ export function defectByNumberOrId(value: string): Defect | undefined {
   return DEFECTS.find((d) => d.id === value || String(d.number) === value)
 }
 
-/** The same handle always gets the same defect, so a re-run of the scaffold is reproducible. */
-export function pickDefect(handle: string): Defect {
+/**
+ * The same handle always gets the same defect, so a re-run of the scaffold is reproducible.
+ * Without a cohort, only defects that can be found without one are eligible.
+ */
+export function pickDefect(handle: string, cohortless = false): Defect {
+  const eligible = cohortless ? DEFECTS.filter((d) => !d.needsCohort) : [...DEFECTS]
   let hash = 0
   for (const ch of handle) hash = (hash * 31 + ch.charCodeAt(0)) >>> 0
-  return DEFECTS[hash % DEFECTS.length] as Defect
+  return eligible[hash % eligible.length] as Defect
 }
 
 /** Runs every detector. A clean directory returns an empty list. */

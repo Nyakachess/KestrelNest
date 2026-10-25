@@ -36,7 +36,7 @@ const mergedPrs = `${SITE.repoUrl}/pulls?q=is%3Apr+is%3Amerged+author%3A${c.hand
           <div class="avatar avatar-lg" style={`background: ${tone(c.handle)}`} aria-hidden="true">{initials(c.profile.name)}</div>
           <div style="flex: 1; min-width: 240px">
             <h1 style="font-size: clamp(26px, 3vw, 34px)">{c.profile.name}</h1>
-            <div class="mono muted mt-1" style="font-size: 11px">@{c.handle} · cohort {c.profile.cohort} · joined {formatDate(c.profile.joined)}</div>
+            <div class="mono muted mt-1" style="font-size: 11px">@{c.handle}{c.profile.cohort && ` · cohort ${c.profile.cohort}`} · joined {formatDate(c.profile.joined)}</div>
             <p class="ink2 mt-2" style="font-size: 15.5px; max-width: 56ch">{c.profile.intro}</p>
             {c.profile.skills_developing.length > 0 && (
               <div class="chips mt-2">{c.profile.skills_developing.map((s) => <span class="chip">{s}</span>)}</div>

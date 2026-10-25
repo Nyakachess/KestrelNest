@@ -3,11 +3,13 @@ import { join } from 'node:path'
 import { CONTRIBUTORS_DIR, explainHandle, isTemplateDir, listCohortIds, validateCohort } from '@nest/schema'
 import { UsageError } from '../args.js'
 import { DEFECTS, defectByNumberOrId, pickDefect, type Defect } from '../defects.js'
+import { NO_COHORT } from '../issue-body.js'
 import type { RepoConfig } from '../root.js'
 import { defaultPlan, renderAll, type ScaffoldFiles } from '../templates.js'
 
 export type ScaffoldOptions = {
   handle: string
+  /** A cohort id, "none" for an individual joiner, or omitted to use the only cohort. */
   cohort?: string | undefined
   /** A defect number or id, or "none". Omitted: chosen from the handle. */
   defect?: string | undefined
@@ -22,24 +24,27 @@ export type ScaffoldResult = {
   dir: string
   files: ScaffoldFiles
   defect: Defect | null
-  cohort: string
+  /** The cohort id, or null for an individual joiner. */
+  cohort: string | null
 }
 
 function resolveCohort(
   config: RepoConfig,
   wanted: string | undefined,
-): { id: string; starts: string | undefined } {
+): { id: string | null; starts: string | undefined } {
+  if (wanted === NO_COHORT) return { id: null, starts: undefined }
   const ids = listCohortIds(config.root)
   if (wanted === undefined) {
     if (ids.length === 1) wanted = ids[0]
     else if (ids.length === 0)
-      throw new UsageError('No cohort exists yet. Pass --cohort <id>, for example --cohort 2027-01.')
+      throw new UsageError(
+        'No cohort exists yet. Pass --cohort <id>, for example --cohort 2027-01, or --cohort none.',
+      )
     else throw new UsageError(`Several cohorts exist (${ids.join(', ')}). Pass --cohort <id>.`)
   }
   const id = wanted as string
   if (!ids.includes(id)) return { id, starts: undefined }
-  const r = validateCohort(config.root, id)
-  return { id, starts: r.cohort?.starts }
+  return { id, starts: validateCohort(config.root, id).cohort?.starts }
 }
 
 /** Builds the files for a contributor directory without touching the disk. */
@@ -59,7 +64,7 @@ export function planScaffold(config: RepoConfig, opts: ScaffoldOptions): Scaffol
 
   let defect: Defect | null = null
   if (template || opts.defect === 'none') defect = null
-  else if (opts.defect === undefined) defect = pickDefect(handle)
+  else if (opts.defect === undefined) defect = pickDefect(handle, cohort.id === null)
   else {
     defect = defectByNumberOrId(opts.defect) ?? null
     if (!defect)

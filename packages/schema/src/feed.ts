@@ -37,7 +37,7 @@ export function buildFeed(
       handle: c.handle,
       name: c.profile.name,
       intro: c.profile.intro,
-      cohort: c.profile.cohort,
+      cohort: c.profile.cohort ?? '',
       stage: stagesDone(c.practice),
       counts: {
         external: c.profile.projects.length,

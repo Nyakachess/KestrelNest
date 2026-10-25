@@ -14,7 +14,8 @@ export const ProjectSchema = z.strictObject({
 export const ProfileSchema = z.strictObject({
   handle: z.string().min(1),
   name: z.string().trim().min(1).max(80),
-  cohort: z.string().regex(COHORT_ID_PATTERN),
+  /** Optional: individual joiners have no cohort. */
+  cohort: z.string().regex(COHORT_ID_PATTERN).optional(),
   joined: z.iso.date(),
   intro: z.string().trim().min(1).max(280),
   skills_developing: z.array(z.string().trim().min(1).max(40)).max(8).default([]),

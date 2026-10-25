@@ -3,7 +3,8 @@ import { PAGE_SECTIONS, type PageSectionTitle } from '@nest/schema'
 /** Everything the scaffold needs to render a contributor directory. Defects edit this before rendering. */
 export type ScaffoldPlan = {
   handle: string
-  cohort: string
+  /** null for an individual joiner with no cohort. */
+  cohort: string | null
   joined: string
   name: string
   next: string | null
@@ -12,7 +13,7 @@ export type ScaffoldPlan = {
   sectionOrder: PageSectionTitle[]
 }
 
-export function defaultPlan(handle: string, cohort: string, joined: string): ScaffoldPlan {
+export function defaultPlan(handle: string, cohort: string | null, joined: string): ScaffoldPlan {
   return {
     handle,
     cohort,
@@ -34,7 +35,9 @@ export function renderProfile(plan: ScaffoldPlan): string {
     '# Keep handle, cohort and joined as they are. Fill in the rest in your own words.',
     `handle: ${plan.handle}`,
     `name: ${yamlString(plan.name)}`,
-    `cohort: ${plan.cohort}`,
+    ...(plan.cohort === null
+      ? ['# cohort: none. Set it when you join one, as YYYY-MM.']
+      : [`cohort: ${plan.cohort}`]),
     `joined: ${plan.joined}`,
     'intro: Replace this with one or two sentences about yourself.',
     plan.skills.length === 0 ? 'skills_developing: []' : 'skills_developing:',

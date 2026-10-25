@@ -4,7 +4,7 @@ import { CONTRIBUTORS_DIR, isPlaceholder, listCohortIds, validateContributor } f
 import { UsageError } from '../args.js'
 import { LABEL_COLORS, type Gh } from '../gh.js'
 import type { Io } from '../io.js'
-import { renderIssue, type RenderedIssue } from '../issue-body.js'
+import { NO_COHORT, renderIssue, type RenderedIssue } from '../issue-body.js'
 import type { RepoConfig } from '../root.js'
 
 export type NewTaskOptions = {
@@ -14,26 +14,29 @@ export type NewTaskOptions = {
   dryRun?: boolean | undefined
 }
 
+/** The display name from the contributor directory, when it exists and is filled in. */
+export function contributorName(config: RepoConfig, handle: string): string | undefined {
+  if (!existsSync(join(config.root, CONTRIBUTORS_DIR, handle))) return undefined
+  const c = validateContributor(config.root, handle).contributor
+  return c && !isPlaceholder(c.profile.name) ? c.profile.name : undefined
+}
+
 /** Looks up the name and cohort from the contributor directory when it exists. */
 export function contributorVars(
   config: RepoConfig,
   handle: string,
   cohort: string | undefined,
 ): { name?: string; cohort: string } {
-  const dir = join(config.root, CONTRIBUTORS_DIR, handle)
-  let name: string | undefined
-  if (existsSync(dir)) {
-    const c = validateContributor(config.root, handle).contributor
-    if (c) {
-      cohort ??= c.profile.cohort
-      if (!isPlaceholder(c.profile.name)) name = c.profile.name
-    }
+  const name = contributorName(config, handle)
+  if (cohort === undefined && existsSync(join(config.root, CONTRIBUTORS_DIR, handle))) {
+    cohort = validateContributor(config.root, handle).contributor?.profile.cohort
   }
   if (cohort === undefined) {
     const ids = listCohortIds(config.root)
     if (ids.length === 1) cohort = ids[0]
   }
-  if (cohort === undefined) throw new UsageError(`No cohort known for ${handle}. Pass --cohort <id>.`)
+  if (cohort === undefined)
+    throw new UsageError(`No cohort known for ${handle}. Pass --cohort <id>, or --cohort ${NO_COHORT}.`)
   return name === undefined ? { cohort } : { name, cohort }
 }
 
@@ -55,11 +58,18 @@ export function ensureIssueLabels(gh: Gh, issue: RenderedIssue, io: Io): void {
 export function runNewTask(config: RepoConfig, opts: NewTaskOptions, gh: Gh | null, io: Io): number {
   const vars = contributorVars(config, opts.handle, opts.cohort)
   const issue = renderIssue(config, opts.stage, { handle: opts.handle, ...vars })
+  const milestone = issue.milestone ?? 'none'
   if (!gh) {
     io.out(`# ${issue.title}`)
-    io.out(`Labels: ${issue.labels.join(', ')}. Assignee: ${opts.handle}. Milestone: ${vars.cohort}.`)
+    io.out(`Labels: ${issue.labels.join(', ')}. Assignee: ${opts.handle}. Milestone: ${milestone}.`)
     io.out('')
     io.out(issue.body.trimEnd())
+    return 0
+  }
+  if (opts.dryRun) {
+    io.out(
+      `Would create issue "${issue.title}" with labels ${issue.labels.join(', ')}, assignee ${opts.handle}, milestone ${milestone}.`,
+    )
     return 0
   }
   const existing = gh.listIssueTitles(opts.handle)
@@ -67,20 +77,15 @@ export function runNewTask(config: RepoConfig, opts: NewTaskOptions, gh: Gh | nu
     io.out(`Skipped: "${issue.title}" already exists for ${opts.handle}.`)
     return 0
   }
-  if (opts.dryRun) {
-    io.out(
-      `Would create issue "${issue.title}" with labels ${issue.labels.join(', ')}, assignee ${opts.handle}, milestone ${vars.cohort}.`,
-    )
-    return 0
-  }
-  if (gh.ensureMilestone(vars.cohort) === 'created') io.out(`Created milestone ${vars.cohort}`)
+  if (issue.milestone && gh.ensureMilestone(issue.milestone) === 'created')
+    io.out(`Created milestone ${issue.milestone}`)
   ensureIssueLabels(gh, issue, io)
   const url = gh.createIssue({
     title: issue.title,
     body: issue.body,
     labels: issue.labels,
     assignee: opts.handle,
-    milestone: vars.cohort,
+    milestone: issue.milestone,
   })
   io.out(`Created ${url}`)
   return 0

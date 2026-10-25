@@ -88,3 +88,22 @@ describe('scaffold', () => {
     expect(existsSync(plan.dir)).toBe(false)
   })
 })
+
+describe('scaffold without a cohort', () => {
+  it('never plants a defect that needs a cohort to be found', () => {
+    for (const handle of [
+      'test-one',
+      'test-two',
+      'test-three',
+      'test-four',
+      'test-five',
+      'test-six',
+      'test-seven',
+    ]) {
+      const config = tempRepo({}, { cohort: false })
+      const result = scaffold(config, { handle, cohort: 'none', today: '2027-01-12' })
+      expect(result.defect?.needsCohort, handle).toBeUndefined()
+      expect(result.cohort).toBeNull()
+    }
+  })
+})

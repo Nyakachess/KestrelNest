@@ -1,4 +1,4 @@
-Hello {{name}}. This is Stage {{stage_number}} of the ladder, {{stage_title}}, for cohort {{cohort}}.
+Hello {{name}}. This is Stage {{stage_number}} of the ladder, {{stage_title}}{{cohort_phrase}}.
 
 This stage is not assigned to you as a personal issue. You claim it from the pool.
 

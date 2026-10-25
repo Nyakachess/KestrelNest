@@ -1,4 +1,4 @@
-Hello {{name}}. This is Stage {{stage_number}} of the ladder, {{stage_title}}, for cohort {{cohort}}.
+Hello {{name}}. This is Stage {{stage_number}} of the ladder, {{stage_title}}{{cohort_phrase}}.
 
 ## Why this stage exists
 

@@ -84,7 +84,7 @@ export function validateRepo(root: string): RepoResult {
     if (!r.contributor) continue
     contributors.push(r.contributor)
     const cohort = r.contributor.profile.cohort
-    if (!r.contributor.isTemplate && cohortIds.size > 0 && !cohortIds.has(cohort)) {
+    if (cohort !== undefined && !r.contributor.isTemplate && cohortIds.size > 0 && !cohortIds.has(cohort)) {
       issues.push({
         file: rel(CONTRIBUTORS_DIR, dir, PROFILE_FILE),
         field: 'cohort',

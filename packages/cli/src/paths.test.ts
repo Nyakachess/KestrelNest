@@ -33,3 +33,23 @@ describe('checkOwnDirectoryChange', () => {
     expect(r.ok).toBe(false)
   })
 })
+
+describe('checkOwnDirectoryChange for the enrolment bot', () => {
+  it('accepts a bot pull request that touches only a cohort file and CODEOWNERS', () => {
+    const r = checkOwnDirectoryChange(
+      ['cohorts/2027-01/cohort.yml', '.github/CODEOWNERS'],
+      'github-actions[bot]',
+    )
+    expect(r).toEqual({ ok: true, handle: 'github-actions[bot]' })
+  })
+
+  it('rejects a bot pull request that touches anything else', () => {
+    const r = checkOwnDirectoryChange(['cohorts/2027-01/cohort.yml', 'README.md'], 'github-actions[bot]')
+    expect(r.ok).toBe(false)
+    if (!r.ok) expect(r.reason).toContain('README.md')
+  })
+
+  it('does not give a human author the bot rule', () => {
+    expect(checkOwnDirectoryChange(['.github/CODEOWNERS'], 'test-one').ok).toBe(false)
+  })
+})
