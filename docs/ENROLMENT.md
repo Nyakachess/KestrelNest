@@ -51,9 +51,13 @@ Enrolment opens the stage issues with the workflow's own token, so their author 
 
 The workflow's own token is not allowed to read or send repository invitations ("Resource not accessible by integration"). Add a repository secret `NEST_ADMIN_TOKEN`: a fine-grained token from a repository admin, limited to this repository, with **Administration: read and write**. `enroll.yml` uses it for the invitation and nothing else, so issues and pull requests are still opened by the bot. Without it, step c fails with a message that names the secret.
 
+## The pull request setting
+
+The scaffold pull request (step b) and a cohort's file pull request (step a) are opened with the workflow's own token, which GitHub refuses unless pull requests from Actions are allowed. Once, as an owner: in the organisation's settings, Actions, General, Workflow permissions, tick "Allow GitHub Actions to create and approve pull requests"; then tick the same box in this repository's settings. Without it step b fails with a message naming this setting, and is not retried. A `NEST_BOT_TOKEN` secret (below) is the alternative.
+
 ## Re-running safely
 
-Run the workflow or the command again for the same handle. Steps that are done are skipped; only what is missing is performed. If a run fails, an issue titled "Enrolment failed for @<handle>" labelled `maintainers` is opened with the job log, and it is closed automatically when a later run for that handle succeeds.
+Run the workflow or the command again for the same handle. Steps that are done are skipped; only what is missing is performed. A scaffold branch an earlier failed run pushed is replaced, since no pull request uses it yet. If a run fails, an issue titled "Enrolment failed for @<handle>" labelled `maintainers` is opened with the job log, and it is closed automatically when a later run for that handle succeeds.
 
 ## Withdrawing someone
 

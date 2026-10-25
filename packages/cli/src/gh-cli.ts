@@ -180,13 +180,20 @@ export class GhCli implements Gh {
   }
 
   createDraftPr(spec: PrSpec): string {
-    this.requireCleanTree(spec.paths)
     const original = this.git(['rev-parse', '--abbrev-ref', 'HEAD'])
-    this.git(['checkout', '-b', spec.branch])
+    // A retry in the same run finds the branch and its commit from the first attempt (the
+    // scaffold files left the working tree with that commit), so it reuses them.
+    const retrying = this.branchExists(spec.branch)
+    if (!retrying) this.requireCleanTree(spec.paths)
+    this.git(retrying ? ['checkout', spec.branch] : ['checkout', '-b', spec.branch])
     try {
-      this.git(['add', '--', ...spec.paths])
-      this.git(['commit', '-m', `feat: scaffold for @${spec.handle}`])
-      this.git(['push', '-u', 'origin', spec.branch])
+      if (!retrying) {
+        this.git(['add', '--', ...spec.paths])
+        this.git(['commit', '-m', `feat: scaffold for @${spec.handle}`])
+      }
+      // No pull request exists from this branch (the caller checked), so it is the bot's own:
+      // a branch an earlier failed run pushed is replaced, not merged into.
+      this.git(['push', '--force', '-u', 'origin', spec.branch])
       const args = [
         'pr',
         'create',
@@ -202,8 +209,19 @@ export class GhCli implements Gh {
       ]
       if (spec.assignee) args.push('--assignee', spec.assignee)
       return this.gh(args, spec.body)
+    } catch (e) {
+      throw explainPrRefusal(e)
     } finally {
       this.git(['checkout', original])
+    }
+  }
+
+  private branchExists(branch: string): boolean {
+    try {
+      this.git(['rev-parse', '--verify', '--quiet', `refs/heads/${branch}`])
+      return true
+    } catch {
+      return false
     }
   }
 
@@ -242,6 +260,8 @@ export class GhCli implements Gh {
         spec.body,
       )
       return { url, action: 'created' }
+    } catch (e) {
+      throw explainPrRefusal(e)
     } finally {
       this.git(['checkout', original])
     }
@@ -361,4 +381,22 @@ export class GhCli implements Gh {
     this.asAdmin(['api', '-X', 'DELETE', `repos/${this.slug}/invitations/${mine.id}`])
     return 'cancelled'
   }
+}
+
+/**
+ * GitHub refuses pull requests from the workflow token unless the repository (and, for an
+ * organisation, the organisation) allows it. Retrying cannot help, so the error says what to
+ * change and is marked as not worth retrying.
+ */
+export function explainPrRefusal(e: unknown): unknown {
+  const text = e instanceof Error ? e.message : String(e)
+  if (!/not permitted to create or approve pull requests/i.test(text)) return e
+  const err = new Error(
+    'GitHub Actions is not allowed to open pull requests in this repository. Turn on "Allow GitHub ' +
+      'Actions to create and approve pull requests" in the organisation settings (Actions, General, ' +
+      'Workflow permissions) and then in the repository settings, or set the NEST_BOT_TOKEN secret ' +
+      '(see docs/ENROLMENT.md).',
+  )
+  ;(err as Error & { retryable?: boolean }).retryable = false
+  return err
 }

@@ -41,7 +41,8 @@ export function withRetry<T>(label: string, fn: () => T, opts: RetryOptions = {}
       return fn()
     } catch (error) {
       last = error
-      if (attempt === attempts) break
+      // an error marked { retryable: false } (a setting, not a flake) stops at once
+      if (attempt === attempts || (error as { retryable?: boolean } | null)?.retryable === false) break
       const delay = retryDelayMs(attempt, error, baseMs, now())
       opts.onRetry?.(attempt, error, delay)
       sleep(delay)
