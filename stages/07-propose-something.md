@@ -30,16 +30,23 @@ Nothing here is required for anything else. Your page keeps growing from merged 
 <!-- Machine-readable summary read by the Kestrel platform. Keep it in step with the text above. -->
 
 ```kestrel-ticket
-stage: 7
+competency: technical-communication
+level: supported
+difficulty: standard
+kp: 0
+evidence_kind: proposal
 reserved_for: {{handle}}
-cohort: {{cohort}}
-evidence: proposal
-title: {{stage_title}}
+stage: 7
 steps:
-  - Pick one thing that was harder than it needed to be and look into it
-  - Open a proposal with the problem, the proposal and the cost, with evidence
-  - Answer the comments and shrink it if needed
-done_when:
-  - Your proposal has all three parts and evidence
-  - It has a decision
+  - title: "Find the friction"
+    guide: "Pick one thing that was harder than it needed to be, and look into it."
+  - title: "Write the proposal"
+    guide: "Open a proposal with the problem, the proposal and the cost, with evidence."
+  - title: "Answer and shrink"
+    guide: "Answer the comments, and shrink the proposal if needed."
+acceptance_criteria:
+  - "Your proposal has all three parts and evidence"
+  - "It has a decision"
+resources:
+  - "{{repo_url}}/blob/main/docs/CONTRIBUTING.md"
 ```

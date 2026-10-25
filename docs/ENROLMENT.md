@@ -43,13 +43,21 @@ Without `--gh` or `--dry-run` the command prints the pull request bodies and the
 
 A week after enrolment with no commit from them, the Onboarding workflow leaves one comment, ever, on their Stage 1 issue with those two steps.
 
+Their stage issues are created while the invitation is still pending, and GitHub drops an assignee who has no access yet. Every half hour the Onboarding workflow's `stage-upkeep` job assigns each open, unassigned stage issue to its owner once they are a collaborator. Kestrel only reserves a stage ticket for the issue's assignee, so the tickets appear on their board after they accept.
+
+## The invitation token
+
+The workflow's own token is not allowed to read or send repository invitations ("Resource not accessible by integration"). Add a repository secret `NEST_ADMIN_TOKEN`: a fine-grained token from a repository admin, limited to this repository, with **Administration: read and write**. `enroll.yml` uses it for the invitation and nothing else, so issues and pull requests are still opened by the bot. Without it, step c fails with a message that names the secret.
+
 ## Re-running safely
 
 Run the workflow or the command again for the same handle. Steps that are done are skipped; only what is missing is performed. If a run fails, an issue titled "Enrolment failed for @<handle>" labelled `maintainers` is opened with the job log, and it is closed automatically when a later run for that handle succeeds.
 
 ## The kestrel-ticket block
 
-Every stage issue ends with a fenced `kestrel-ticket` block that Kestrel reads to create a ticket on the person's board: `stage`, `reserved_for` (the handle), `cohort`, `evidence` (practice, shared_project, review or proposal), `title`, `steps` and `done_when`. The text above the block is for people; the block is for the platform. Keep them in step.
+Every stage issue ends with a fenced `kestrel-ticket` block that Kestrel reads to create a ticket on the person's board. Kestrel validates it strictly (its decision D-38), so the block has exactly these keys: `competency` (a rubric slug: debugging, automated-testing or technical-communication), `level` (guided, supported or independent), `difficulty` (starter, standard or stretch), `kp` (0 to 3), `evidence_kind` (practice, shared_project or proposal), `reserved_for` (the handle, or null for a shared issue), `stage`, `steps` (1 to 8, each with `title` and `guide`), `acceptance_criteria` (1 to 8 sentences) and `resources` (0 to 5 https URLs). The text above the block is for people; the block is for the platform. Keep them in step.
+
+When a template's block changes, run the Onboarding workflow by hand with **refresh blocks** ticked: it puts the current block into every open stage issue created from an older one.
 
 ## Two limits worth knowing
 

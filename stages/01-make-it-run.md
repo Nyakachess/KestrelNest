@@ -59,18 +59,27 @@ Ask early. Asking never costs you anything here. Comment with the exact command 
 <!-- Machine-readable summary read by the Kestrel platform. Keep it in step with the text above. -->
 
 ```kestrel-ticket
-stage: 1
+competency: technical-communication
+level: guided
+difficulty: starter
+kp: 1
+evidence_kind: practice
 reserved_for: {{handle}}
-cohort: {{cohort}}
-evidence: practice
-title: {{stage_title}}
+stage: 1
 steps:
-  - Accept the collaborator invitation GitHub emailed you, then clone the repo
-  - Run npm install and npm test, and note anything the commands did not say
-  - Post three sentences on what Nest is and where your directory lives
-  - Add your handle to CONTRIBUTORS.md on a branch and open a pull request
-done_when:
-  - Accept the collaborator invitation GitHub emailed you, then clone the repo
-  - npm test passes on your machine
-  - Your handle is in CONTRIBUTORS.md on main
+  - title: "Get the code running"
+    guide: "Accept the collaborator invitation GitHub emailed you, clone the repo, run npm install and npm test, and note anything the commands did not say."
+  - title: "Look around first"
+    guide: "Post three sentences on this issue: what Nest does, how the code is organised, and where your directory will live."
+  - title: "Add yourself"
+    guide: "On a branch, add your handle to the end of CONTRIBUTORS.md, run npm run lint, and commit."
+  - title: "Open the pull request"
+    guide: "Push, open a pull request that says Closes and this issue's number, and fix any red checks until a maintainer merges it."
+acceptance_criteria:
+  - "npm test passes on your machine"
+  - "Your handle is in CONTRIBUTORS.md on main"
+  - "You can say what a branch, a commit and a pull request are"
+resources:
+  - "{{repo_url}}/blob/main/docs/CONTRIBUTING.md"
+  - "{{repo_url}}/blob/main/docs/DEVELOPMENT.md"
 ```

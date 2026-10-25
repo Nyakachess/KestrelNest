@@ -42,17 +42,25 @@ Paste your test and the output here. The two usual snags: asserting the fix inst
 <!-- Machine-readable summary read by the Kestrel platform. Keep it in step with the text above. -->
 
 ```kestrel-ticket
-stage: 4
+competency: automated-testing
+level: guided
+difficulty: starter
+kp: 2
+evidence_kind: practice
 reserved_for: {{handle}}
-cohort: {{cohort}}
-evidence: practice
-title: {{stage_title}}
+stage: 4
 steps:
-  - Post in words what the test will check
-  - Write the test in profile.test.ts, starting from the shape of the existing one
-  - Put the defect back and watch the test fail
-  - Remove the defect, watch it pass, open a pull request with both outputs
-done_when:
-  - The test fails with the defect and passes without it
-  - The test is merged and runs in CI
+  - title: "Say what it checks"
+    guide: "Post in words what the test will check."
+  - title: "Write the test"
+    guide: "Write it in profile.test.ts, starting from the shape of the existing one."
+  - title: "Watch it fail"
+    guide: "Put the defect back and watch the test fail."
+  - title: "Watch it pass"
+    guide: "Remove the defect, watch the test pass, and open a pull request with both outputs."
+acceptance_criteria:
+  - "The test fails with the defect and passes without it"
+  - "The test is merged and runs in CI"
+resources:
+  - "{{repo_url}}/blob/main/docs/CONTRIBUTING.md"
 ```

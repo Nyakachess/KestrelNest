@@ -30,16 +30,23 @@ If there is no open pull request to review, say so here and a maintainer will po
 <!-- Machine-readable summary read by the Kestrel platform. Keep it in step with the text above. -->
 
 ```kestrel-ticket
-stage: 6
+competency: technical-communication
+level: supported
+difficulty: standard
+kp: 1
+evidence_kind: practice
 reserved_for: {{handle}}
-cohort: {{cohort}}
-evidence: review
-title: {{stage_title}}
+stage: 6
 steps:
-  - Read a peer pull request, description first, then run it
-  - Leave at least one line comment and a verdict
-  - Ask a peer to review one of yours and answer every comment
-done_when:
-  - You reviewed a peer pull request that has merged
-  - A peer reviewed one of yours
+  - title: "Read and run it"
+    guide: "Read a peer's pull request, description first, then run it."
+  - title: "Review it"
+    guide: "Leave at least one line comment and a verdict."
+  - title: "Be reviewed"
+    guide: "Ask a peer to review one of yours, and answer every comment."
+acceptance_criteria:
+  - "You reviewed a peer pull request that has merged"
+  - "A peer reviewed one of yours"
+resources:
+  - "{{repo_url}}/blob/main/docs/CONTRIBUTING.md"
 ```

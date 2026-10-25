@@ -47,17 +47,25 @@ Paste the output of `npm run validate` here, exactly. The message tells you what
 <!-- Machine-readable summary read by the Kestrel platform. Keep it in step with the text above. -->
 
 ```kestrel-ticket
-stage: 2
+competency: technical-communication
+level: guided
+difficulty: starter
+kp: 1
+evidence_kind: practice
 reserved_for: {{handle}}
-cohort: {{cohort}}
-evidence: practice
-title: {{stage_title}}
+stage: 2
 steps:
-  - Fill in profile.yml and page.md in your own words
-  - Post one line saying what your intro says
-  - Run nest validate until it reports no problems
-  - Set visibility.page to public and open a pull request
-done_when:
-  - nest validate reports no problems
-  - Your page is live on the site
+  - title: "Write your page"
+    guide: "Fill in profile.yml and page.md in your own words."
+  - title: "Say it in one line"
+    guide: "Post one line on this issue saying what your intro says."
+  - title: "Validate"
+    guide: "Run nest validate until it reports no problems."
+  - title: "Publish"
+    guide: "Set visibility.page to public and open a pull request."
+acceptance_criteria:
+  - "nest validate reports no problems"
+  - "Your page is live on the site"
+resources:
+  - "{{repo_url}}/blob/main/docs/CONTRIBUTING.md"
 ```

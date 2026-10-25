@@ -33,19 +33,28 @@ After thirty minutes of real looking, post your notes so far. You will get a nar
 <!-- Machine-readable summary read by the Kestrel platform. Keep it in step with the text above. -->
 
 ```kestrel-ticket
-stage: 3
+competency: debugging
+level: guided
+difficulty: starter
+kp: 2
+evidence_kind: practice
 reserved_for: {{handle}}
-cohort: {{cohort}}
-evidence: practice
-title: {{stage_title}}
+stage: 3
 steps:
-  - Predict where the defect lives before opening a file
-  - Read your live page and record what you saw and what you expected
-  - Write your guess and your check before you look
-  - Do the check, fix with the smallest change, run everything, open a pull request
-  - After the merge, say what you would do differently next time
-done_when:
-  - Your three check-ins are on the issue
-  - The fix merged and the page shows the right thing
-  - The pull request says why the checks did not catch it
+  - title: "Predict first"
+    guide: "Write where you think the defect lives before you open a file."
+  - title: "Observe"
+    guide: "Read your live page and record what you saw and what you expected."
+  - title: "Guess and check"
+    guide: "Write your guess and how you will check it before you look."
+  - title: "Fix it"
+    guide: "Do the check, make the smallest change, run everything and open a pull request."
+  - title: "Reflect"
+    guide: "After the merge, say what you would do differently next time."
+acceptance_criteria:
+  - "Your three check-ins are on this issue"
+  - "The fix merged and the page shows the right thing"
+  - "The pull request says why the checks did not catch it"
+resources:
+  - "{{repo_url}}/blob/main/docs/CONTRIBUTING.md"
 ```

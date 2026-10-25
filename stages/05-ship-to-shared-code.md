@@ -34,17 +34,25 @@ Comment on the issue you claimed, not here. If the issue itself turned out to be
 <!-- Machine-readable summary read by the Kestrel platform. Keep it in step with the text above. -->
 
 ```kestrel-ticket
+competency: debugging
+level: supported
+difficulty: standard
+kp: 3
+evidence_kind: shared_project
+reserved_for: null
 stage: 5
-reserved_for: {{handle}}
-cohort: {{cohort}}
-evidence: shared_project
-title: {{stage_title}}
 steps:
-  - Claim an issue labelled good-shared-issue
-  - Post where you expect the change to live, then reproduce before changing anything
-  - Make the change with a test and open a pull request with what, why, how checked and what it does not cover
-  - Answer every review comment with a change or a reason
-done_when:
-  - Your change to shared code is merged after review
-  - Every acceptance criterion was checked
+  - title: "Claim a shared issue"
+    guide: "Claim an issue labelled good-shared-issue."
+  - title: "Reproduce first"
+    guide: "Post where you expect the change to live, then reproduce the problem before changing anything."
+  - title: "Change it with a test"
+    guide: "Make the change with a test and open a pull request saying what, why, how you checked it and what it does not cover."
+  - title: "Answer the review"
+    guide: "Answer every review comment with a change or a reason."
+acceptance_criteria:
+  - "Your change to shared code is merged after review"
+  - "Every acceptance criterion was checked"
+resources:
+  - "{{repo_url}}/blob/main/docs/CONTRIBUTING.md"
 ```
