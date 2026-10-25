@@ -107,3 +107,7 @@ Your scaffold has one defect planted on purpose. Finding it is Stage 3. Do not g
 - Stuck on git or the terminal: say so in your stage issue. That is what it is for, and the question helps the next person.
 - Found a bug in Nest itself: open an issue with what you did, what you expected and what happened. That is real open-source work, and if you fix it, it counts as shared code.
 - Something uncomfortable happened: see [CODE_OF_CONDUCT.md](../CODE_OF_CONDUCT.md).
+
+## How you got here
+
+Your directory, your collaborator invitation and your stage issues were created by [enrolment](ENROLMENT.md), either when Kestrel enrolled you or when a maintainer ran it for you. If any of them is missing, say so on any of your issues; the command is safe to run again.

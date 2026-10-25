@@ -61,6 +61,7 @@ MIT. See [LICENSE](LICENSE).
 
 ## Documents
 
-- [Contributing](docs/CONTRIBUTING.md): the first pull request, step by step.
+- [Contributing](docs/CONTRIBUTING.md): the first pull request, step by step. [Development](docs/DEVELOPMENT.md) for the setup alone.
+- [Enrolment](docs/ENROLMENT.md): how a person gets their directory, invitation and stage issues.
 - [Roadmap](docs/roadmap.md) and [decisions](docs/adr/).
 - [Privacy](docs/PRIVACY.md), [governance](docs/GOVERNANCE.md), [code of conduct](CODE_OF_CONDUCT.md), [security](SECURITY.md).
