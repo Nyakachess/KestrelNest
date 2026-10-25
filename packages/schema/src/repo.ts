@@ -32,7 +32,8 @@ export function validateCohort(root: string, id: string): CohortResult {
     issues.push({
       file: rel(COHORTS_DIR, id),
       field: 'directory',
-      message: 'must be named as a year and month, for example cohorts/2027-01/.',
+      message:
+        'must be named as a year and month, or as a start date, for example cohorts/2027-01/ or cohorts/2027-01-12/.',
     })
   }
   if (!existsSync(path)) {

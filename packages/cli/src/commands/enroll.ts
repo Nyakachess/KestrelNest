@@ -71,7 +71,9 @@ export function enroll(config: RepoConfig, opts: EnrollOptions, gh: Gh, io: Io):
   let cohort = opts.cohort
   if (cohort !== NO_COHORT) {
     if (!isCohortId(cohort))
-      throw new UsageError(`The cohort must be a year and month like 2027-01, or "none", not "${cohort}".`)
+      throw new UsageError(
+        `The cohort must be a year and month like 2027-01, a start date like 2027-01-12, or "none", not "${cohort}".`,
+      )
     if (!existsSync(join(config.root, COHORTS_DIR, cohort, COHORT_FILE))) {
       // The platform may enrol someone into a cohort this repository has not opened yet. They are
       // not held back: they start as an individual joiner, and open-cohort adds them to the cohort

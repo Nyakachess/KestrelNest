@@ -10,15 +10,22 @@ export const HANDLE_PATTERN = /^[a-z0-9](?:-?[a-z0-9]){0,38}$/
 
 export const HANDLE_MAX_LENGTH = 39
 
-/** Cohort ids are a year and a month: 2027-01. */
-export const COHORT_ID_PATTERN = /^\d{4}-(0[1-9]|1[0-2])$/
+/**
+ * Cohort ids are a year and a month (2027-01), or the cohort's start date (2027-01-12) when the
+ * platform opens a cohort every two weeks and two can start in one month.
+ */
+export const COHORT_ID_PATTERN = /^\d{4}-(0[1-9]|1[0-2])(-(0[1-9]|[12]\d|3[01]))?$/
 
 export function isHandle(value: string): boolean {
   return value.length <= HANDLE_MAX_LENGTH && HANDLE_PATTERN.test(value)
 }
 
 export function isCohortId(value: string): boolean {
-  return COHORT_ID_PATTERN.test(value)
+  if (!COHORT_ID_PATTERN.test(value)) return false
+  if (value.length === 7) return true
+  // a start date must be a real day: 2027-02-30 is not
+  const day = new Date(`${value}T00:00:00Z`)
+  return !Number.isNaN(day.getTime()) && day.toISOString().slice(0, 10) === value
 }
 
 /** Directories whose name starts with an underscore are templates, never contributors. */

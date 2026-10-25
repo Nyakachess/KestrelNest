@@ -28,9 +28,10 @@ const MONTHS = [
   'December',
 ]
 
-/** "2027-01" becomes "January 2027 cohort". */
+/** "2027-01" becomes "January 2027 cohort"; "2026-11-02" becomes "Cohort starting 2 November 2026". */
 export function cohortDisplayName(id: string): string {
-  const [year, month] = id.split('-')
+  const [year, month, day] = id.split('-')
   const name = MONTHS[Number(month) - 1]
-  return name ? `${name} ${year} cohort` : `Cohort ${id}`
+  if (!name) return `Cohort ${id}`
+  return day ? `Cohort starting ${Number(day)} ${name} ${year}` : `${name} ${year} cohort`
 }

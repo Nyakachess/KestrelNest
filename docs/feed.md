@@ -31,7 +31,7 @@ One static JSON file, written at build time from the repository. No server, no a
 | `pages`           | Every publishable page, sorted by handle. Empty on day one: `[]`.                |
 | `handle`          | The GitHub login in lower case; also the directory name under `contributors/`.   |
 | `name`, `intro`   | Exactly as the owner wrote them in `profile.yml`.                                |
-| `cohort`          | Year and month, `YYYY-MM`.                                                       |
+| `cohort`          | Year and month, `YYYY-MM`, or a start date, `YYYY-MM-DD`.                        |
 | `stage`           | Number of distinct ladder stages completed, 0 to 7.                              |
 | `counts.external` | Entries in the owner's `projects` list. Listed by the owner, not verified.       |
 | `counts.shared`   | Merged pull requests by the owner that touched anything outside `contributors/`. |

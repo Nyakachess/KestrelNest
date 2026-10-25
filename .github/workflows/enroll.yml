@@ -16,7 +16,7 @@ on:
         required: true
         type: string
       cohort:
-        description: Cohort id as YYYY-MM, or none
+        description: Cohort id as YYYY-MM or YYYY-MM-DD (its start date), or none
         required: true
         type: string
         default: none

@@ -1,6 +1,6 @@
 # cohorts/
 
-One directory per cohort, named by year and month, holding a single `cohort.yml`:
+One directory per cohort, holding a single `cohort.yml`. A cohort is named by its year and month (`2027-01`) or, when Kestrel opens one every two weeks, by its start date (`2027-01-12`); both forms are valid and can sit side by side.
 
 ```yaml
 id: 2027-01

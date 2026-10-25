@@ -45,4 +45,10 @@ describe('isCohortId', () => {
   it.each(['2027-13', '2027-1', '27-01', '2027/01', 'january'])('rejects %s', (id) =>
     expect(isCohortId(id)).toBe(false),
   )
+  it.each(['2026-11-02', '2028-02-29', '2027-12-31'])('accepts the start date %s', (id) =>
+    expect(isCohortId(id)).toBe(true),
+  )
+  it.each(['2026-11-2', '2027-02-29', '2027-04-31', '2027-01-00', '2027-01-12-1'])('rejects %s', (id) =>
+    expect(isCohortId(id)).toBe(false),
+  )
 })
