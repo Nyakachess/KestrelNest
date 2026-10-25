@@ -1,0 +1,48 @@
+name: Withdraw
+
+# Takes a person out of the onboarding ladder so a later enrolment starts them afresh: closes
+# their open stage issues as not planned, renames every stage issue of theirs so its title no
+# longer ends "(@handle)", closes their open scaffold and cohort pull requests, and cancels a
+# pending invitation. Collaborator access, contributors/<handle>/ and the CONTRIBUTORS.md line
+# are left alone. Kestrel can send a repository_dispatch of type "withdraw" with
+# client_payload { handle }; a maintainer can run it from the Actions tab.
+on:
+  repository_dispatch:
+    types: [withdraw]
+  workflow_dispatch:
+    inputs:
+      handle:
+        description: GitHub login of the person to withdraw
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+# the same group as Enrol, so a withdrawal and an enrolment for one person never overlap
+concurrency:
+  group: enroll-${{ github.event.client_payload.handle || inputs.handle }}
+  cancel-in-progress: false
+
+jobs:
+  withdraw:
+    runs-on: ubuntu-latest
+    env:
+      HANDLE: ${{ github.event.client_payload.handle || inputs.handle }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Build the CLI
+        run: npx tsc -b
+      - name: Withdraw
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # only for cancelling a pending invitation, which the workflow token is not allowed to do
+          NEST_ADMIN_TOKEN: ${{ secrets.NEST_ADMIN_TOKEN }}
+        run: node packages/cli/bin/nest.js withdraw "$HANDLE" --gh

@@ -2,9 +2,17 @@ import { execFileSync, type ExecFileSyncOptionsWithStringEncoding } from 'node:c
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { UsageError } from './args.js'
-import type { CollaboratorState, FilePrResult, FilePrSpec, Gh, IssueSpec, PrSpec } from './gh.js'
+import type { CollaboratorState, FilePrResult, FilePrSpec, Gh, IssueSpec, PrSpec, StageIssue } from './gh.js'
 
-type Json = { title?: string; url?: string; name?: string; invitee?: { login?: string } }[]
+type Json = {
+  title?: string
+  url?: string
+  name?: string
+  number?: number
+  state?: string
+  id?: number
+  invitee?: { login?: string }
+}[]
 
 /** The real thing, through the GitHub CLI and git. */
 export class GhCli implements Gh {
@@ -276,5 +284,81 @@ export class GhCli implements Gh {
       '-f',
       `permission=${permission}`,
     ])
+  }
+
+  listStageIssues(handle: string): StageIssue[] {
+    const mine = `(@${handle.toLowerCase()})`
+    return this.ghJson([
+      'issue',
+      'list',
+      '--repo',
+      this.slug,
+      '--label',
+      'onboarding',
+      '--state',
+      'all',
+      '--limit',
+      '500',
+      '--json',
+      'number,title,state',
+    ])
+      .filter((i) => (i.title ?? '').toLowerCase().endsWith(mine) && typeof i.number === 'number')
+      .map((i): StageIssue => ({
+        number: i.number as number,
+        title: i.title ?? '',
+        state: (i.state ?? '').toUpperCase() === 'OPEN' ? 'open' : 'closed',
+      }))
+  }
+
+  closeIssueNotPlanned(number: number, comment: string): void {
+    this.gh([
+      'issue',
+      'close',
+      String(number),
+      '--repo',
+      this.slug,
+      '--reason',
+      'not planned',
+      '--comment',
+      comment,
+    ])
+  }
+
+  renameIssue(number: number, title: string): void {
+    this.gh(['issue', 'edit', String(number), '--repo', this.slug, '--title', title])
+  }
+
+  closeOpenPr(branch: string, comment: string): string | null {
+    const open = this.ghJson([
+      'pr',
+      'list',
+      '--repo',
+      this.slug,
+      '--head',
+      branch,
+      '--state',
+      'open',
+      '--limit',
+      '1',
+      '--json',
+      'number,url',
+    ])[0]
+    if (!open || typeof open.number !== 'number') return null
+    this.gh(['pr', 'close', String(open.number), '--repo', this.slug, '--comment', comment])
+    return open.url ?? null
+  }
+
+  canManageInvitations(): boolean {
+    return this.adminToken !== ''
+  }
+
+  cancelInvitation(handle: string): 'cancelled' | 'none' {
+    const invited = JSON.parse(
+      this.asAdmin(['api', `repos/${this.slug}/invitations?per_page=100`, '--paginate']) || '[]',
+    ) as Json
+    const mine = invited.find((i) => i.invitee?.login?.toLowerCase() === handle.toLowerCase())
+    if (!mine || typeof mine.id !== 'number') return 'none'
+    this.asAdmin(['api', '-X', 'DELETE', `repos/${this.slug}/invitations/${mine.id}`])
+    return 'cancelled'
   }
 }

@@ -14,7 +14,7 @@ type Workflow = { name?: string; on?: unknown; jobs?: Record<string, Job> }
 describe('GitHub configuration as code', () => {
   const files = readdirSync(WORKFLOWS).filter((f) => f.endsWith('.yml'))
 
-  it('has the six workflows', () => {
+  it('has the seven workflows', () => {
     expect(files.sort()).toEqual([
       'auto-merge.yml',
       'ci.yml',
@@ -22,6 +22,7 @@ describe('GitHub configuration as code', () => {
       'labels.yml',
       'onboarding.yml',
       'practice-counts.yml',
+      'withdraw.yml',
     ])
   })
 

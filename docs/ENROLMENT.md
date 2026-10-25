@@ -53,6 +53,19 @@ The workflow's own token is not allowed to read or send repository invitations (
 
 Run the workflow or the command again for the same handle. Steps that are done are skipped; only what is missing is performed. If a run fails, an issue titled "Enrolment failed for @<handle>" labelled `maintainers` is opened with the job log, and it is closed automatically when a later run for that handle succeeds.
 
+## Withdrawing someone
+
+Use it when a person leaves before finishing, or to start someone again from Stage 1 (a new Kestrel account for the same GitHub login, for example). Re-enrolment alone cannot do that, because it skips every stage issue whose title already exists, open or closed.
+
+`nest withdraw <handle> --gh` (or Actions tab, "Withdraw", with the handle; Kestrel can send a `repository_dispatch` of type `withdraw` with `client_payload: { "handle": "a-login" }`) does, idempotently:
+
+- closes the person's open stage issues as not planned, with one comment saying a new enrolment opens fresh ones;
+- renames every stage issue of theirs, open or closed, by appending ` [withdrawn YYYY-MM-DD]`, so the title no longer ends `(@handle)`: enrolment and the Onboarding upkeep no longer see it, and Kestrel withdraws a ticket whose issue is closed as not planned;
+- closes an open pull request from `scaffold/<handle>` or `bot/enroll-<handle>`;
+- cancels a pending invitation, when the `NEST_ADMIN_TOKEN` secret is there (otherwise it says it left the invitation as it is).
+
+It leaves in place, on purpose: collaborator access, the person's `contributors/<handle>/` directory and their `CONTRIBUTORS.md` line. A second run finds nothing to do. Enrol the person again afterwards to open six fresh stage issues.
+
 ## The kestrel-ticket block
 
 Every stage issue ends with a fenced `kestrel-ticket` block that Kestrel reads to create a ticket on the person's board. Kestrel validates it strictly (its decision D-38), so the block has exactly these keys: `competency` (a rubric slug: debugging, automated-testing or technical-communication), `level` (guided, supported or independent), `difficulty` (starter, standard or stretch), `kp` (0 to 3), `evidence_kind` (practice, shared_project or proposal), `reserved_for` (the handle, or null for a shared issue), `stage`, `steps` (1 to 8, each with `title` and `guide`), `acceptance_criteria` (1 to 8 sentences) and `resources` (0 to 5 https URLs). The text above the block is for people; the block is for the platform. Keep them in step.

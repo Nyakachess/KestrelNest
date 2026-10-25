@@ -1,5 +1,5 @@
 import { UsageError } from './args.js'
-import type { CollaboratorState, FilePrResult, FilePrSpec, Gh, IssueSpec, PrSpec } from './gh.js'
+import type { CollaboratorState, FilePrResult, FilePrSpec, Gh, IssueSpec, PrSpec, StageIssue } from './gh.js'
 
 type Method = keyof Gh
 
@@ -12,6 +12,13 @@ export class FakeGh implements Gh {
   milestones = new Set<string>()
   collaborators = new Set<string>()
   invitations = new Set<string>()
+  /** Issue numbers (1-based positions in `issues`) that are closed, and the comments left on issues. */
+  closedIssues = new Set<number>()
+  comments = new Map<number, string[]>()
+  /** Branches whose pull request has been closed. */
+  closedBranches = new Set<string>()
+  /** Whether the admin token is present, so invitations can be read and cancelled. */
+  adminToken = true
   calls: string[] = []
   private counter = 0
   private failures = new Map<Method, number>()
@@ -107,6 +114,45 @@ export class FakeGh implements Gh {
     this.record('inviteCollaborator', handle)
     this.invitations.add(handle.toLowerCase())
   }
+
+  listStageIssues(handle: string): StageIssue[] {
+    this.record('listStageIssues', handle)
+    const mine = `(@${handle.toLowerCase()})`
+    return this.issues.flatMap((issue, i): StageIssue[] =>
+      issue.labels.includes('onboarding') && issue.title.toLowerCase().endsWith(mine)
+        ? [{ number: i + 1, title: issue.title, state: this.closedIssues.has(i + 1) ? 'closed' : 'open' }]
+        : [],
+    )
+  }
+
+  closeIssueNotPlanned(number: number, comment: string): void {
+    this.record('closeIssueNotPlanned', String(number))
+    this.closedIssues.add(number)
+    this.comments.set(number, [...(this.comments.get(number) ?? []), comment])
+  }
+
+  renameIssue(number: number, title: string): void {
+    this.record('renameIssue', `${number} ${title}`)
+    const issue = this.issues[number - 1]
+    if (issue) issue.title = title
+  }
+
+  closeOpenPr(branch: string): string | null {
+    this.record('closeOpenPr', branch)
+    const exists = this.prs.some((p) => p.branch === branch) || this.filePrs.has(branch)
+    if (!exists || this.closedBranches.has(branch)) return null
+    this.closedBranches.add(branch)
+    return `https://example.test/pr/${branch}`
+  }
+
+  canManageInvitations(): boolean {
+    return this.adminToken
+  }
+
+  cancelInvitation(handle: string): 'cancelled' | 'none' {
+    this.record('cancelInvitation', handle)
+    return this.invitations.delete(handle.toLowerCase()) ? 'cancelled' : 'none'
+  }
 }
 
 const NOT_INSTALLED = 'gh is not installed, so nothing can be created. Install GitHub CLI or drop --gh.'
@@ -138,6 +184,24 @@ export class NullGh implements Gh {
     return 'none'
   }
   inviteCollaborator(): never {
+    throw new UsageError(NOT_INSTALLED)
+  }
+  listStageIssues(): StageIssue[] {
+    return []
+  }
+  closeIssueNotPlanned(): never {
+    throw new UsageError(NOT_INSTALLED)
+  }
+  renameIssue(): never {
+    throw new UsageError(NOT_INSTALLED)
+  }
+  closeOpenPr(): null {
+    return null
+  }
+  canManageInvitations(): boolean {
+    return false
+  }
+  cancelInvitation(): never {
     throw new UsageError(NOT_INSTALLED)
   }
 }

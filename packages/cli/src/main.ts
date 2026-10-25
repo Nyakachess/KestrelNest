@@ -9,6 +9,7 @@ import { runNewTask } from './commands/new-task.js'
 import { openCohort } from './commands/open-cohort.js'
 import { scaffold } from './commands/scaffold.js'
 import { runValidate } from './commands/validate.js'
+import { withdraw } from './commands/withdraw.js'
 import { GhCli } from './gh-cli.js'
 import { NullGh } from './gh-fakes.js'
 import type { Gh } from './gh.js'
@@ -31,6 +32,8 @@ Usage: nest <command> [options]
       --name "<Name>" --cohort <id|none> [--gh] [--dry-run]
   open-cohort <id>                 Enrol every member of a cohort.
       [--gh] [--dry-run]
+  withdraw <handle>                Close and rename the person's stage issues and close their open
+      [--gh] [--dry-run]           pull requests, so a new enrolment starts them afresh.
   defect-request --round <n>       Write the request file for a round of candidate defects (P2).
       [--count <n>] [--out <file>]
   defect-import <runner-output>    Write the runner's acceptable outputs as candidate defects.
@@ -111,6 +114,12 @@ export function main(argv: readonly string[]): number | Promise<number> {
         ghFor(config, mode),
         io,
       )
+      return report.failed ? 1 : 0
+    }
+    case 'withdraw': {
+      const handle = positionals[0]
+      if (!handle) throw new UsageError('withdraw needs a handle: nest withdraw <handle>')
+      const report = withdraw({ handle, mode }, ghFor(config, mode), io)
       return report.failed ? 1 : 0
     }
     case 'open-cohort': {
