@@ -6,12 +6,14 @@ type Props = {
   action?: { href: string; label: string } | undefined
 }
 
-const defaultNav = [
+type NavItem = { href: string; label: string; current?: boolean }
+
+const defaultNav: NavItem[] = [
   { href: '/cohorts/', label: 'Cohorts' },
   { href: `${SITE.repoUrl}/blob/main/docs/roadmap.md`, label: 'Roadmap' },
   { href: `${SITE.repoUrl}/blob/main/docs/CONTRIBUTING.md`, label: 'Contributing' },
 ]
-const nav = Astro.props.nav ?? defaultNav
+const nav: NavItem[] = Astro.props.nav ?? defaultNav
 const action = Astro.props.action ?? { href: SITE.repoUrl, label: 'GitHub' }
 ---
 
