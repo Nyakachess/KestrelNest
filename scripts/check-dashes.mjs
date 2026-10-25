@@ -4,7 +4,7 @@
 import { execFileSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
 
-const EM_DASH = '—'
+const EM_DASH = String.fromCharCode(0x2014)
 const SKIP = [/^docs\/design\//, /\.(png|jpg|ico|woff2)$/]
 
 const files = execFileSync('git', ['ls-files', '-z'], { encoding: 'utf8' })
