@@ -1,4 +1,5 @@
 import { flagBool, flagString, parseArgs, UsageError } from './args.js'
+import { runDefectCheck } from './commands/defect-check.js'
 import { runDefectImport } from './commands/defect-import.js'
 import { runDefectRequest } from './commands/defect-request.js'
 import { enroll, type EnrollMode } from './commands/enroll.js'
@@ -32,6 +33,7 @@ Usage: nest <command> [options]
   defect-request --round <n>       Write the request file for a round of candidate defects (P2).
       [--count <n>] [--out <file>]
   defect-import <runner-output>    Write the runner's acceptable outputs as candidate defects.
+  defect-check <id> | --all        Run the gate on candidate defects and record the results.
 
 Every command accepts --root <dir>. Without it the repository is found from the current directory.
 --dry-run prints what would happen and makes no GitHub calls. Without --gh the bodies are printed instead.`
@@ -47,7 +49,7 @@ function ghFor(config: { root: string; slug: string }, mode: EnrollMode): Gh {
   return new GhCli(config.root, config.slug, process.env.NEST_ADMIN_TOKEN ?? '')
 }
 
-export function main(argv: readonly string[]): number {
+export function main(argv: readonly string[]): number | Promise<number> {
   const { command, positionals, flags } = parseArgs(argv)
   const io = consoleIo
   if (command === undefined || command === 'help' || flagBool(flags, 'help')) {
@@ -126,6 +128,8 @@ export function main(argv: readonly string[]): number {
         io,
       )
     }
+    case 'defect-check':
+      return runDefectCheck(config, { id: positionals[0], all: flagBool(flags, 'all') }, io)
     case 'defect-import': {
       const file = positionals[0]
       if (!file) throw new UsageError('defect-import needs the runner output file: nest defect-import <file>')
@@ -136,11 +140,30 @@ export function main(argv: readonly string[]): number {
   }
 }
 
-try {
-  process.exitCode = main(process.argv.slice(2))
-} catch (e) {
+function onError(e: unknown): void {
   if (e instanceof UsageError) {
     console.error(e.message)
     process.exitCode = 2
   } else throw e
+}
+
+try {
+  const code = main(process.argv.slice(2))
+  if (typeof code === 'number') process.exitCode = code
+  else
+    code.then(
+      (c) => {
+        process.exitCode = c
+      },
+      (e: unknown) => {
+        try {
+          onError(e)
+        } catch (err) {
+          console.error(err)
+          process.exitCode = 1
+        }
+      },
+    )
+} catch (e) {
+  onError(e)
 }
