@@ -39,7 +39,7 @@ function ghFor(config: { root: string; slug: string }, mode: EnrollMode): Gh {
   if (mode !== 'apply') return new NullGh()
   if (!GhCli.available())
     throw new UsageError('GitHub CLI (gh) is not installed or not on PATH, so --gh cannot be used.')
-  return new GhCli(config.root, config.slug)
+  return new GhCli(config.root, config.slug, process.env.NEST_ADMIN_TOKEN ?? '')
 }
 
 export function main(argv: readonly string[]): number {

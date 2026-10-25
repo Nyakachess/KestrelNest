@@ -8,9 +8,17 @@ type Json = { title?: string; url?: string; name?: string; invitee?: { login?: s
 
 /** The real thing, through the GitHub CLI and git. */
 export class GhCli implements Gh {
+  /**
+   * `adminToken` is used only for the two invitation calls. The workflow's own token cannot
+   * read or send repository invitations ("Resource not accessible by integration"), so the
+   * Enrol workflow passes the NEST_ADMIN_TOKEN secret: a token from a repository admin with
+   * Administration: write. Everything else keeps the workflow token, so the issues and pull
+   * requests are still opened by the bot.
+   */
   constructor(
     private readonly root: string,
     private readonly slug: string,
+    private readonly adminToken: string = '',
   ) {}
 
   static available(): boolean {
@@ -22,13 +30,14 @@ export class GhCli implements Gh {
     }
   }
 
-  private gh(args: string[], input?: string): string {
+  private gh(args: string[], input?: string, token?: string): string {
     try {
       const opts: ExecFileSyncOptionsWithStringEncoding = {
         cwd: this.root,
         encoding: 'utf8',
         stdio: 'pipe',
         ...(input === undefined ? {} : { input }),
+        ...(token ? { env: { ...process.env, GH_TOKEN: token } } : {}),
       }
       return execFileSync('gh', args, opts).trim()
     } catch (e) {
@@ -49,10 +58,27 @@ export class GhCli implements Gh {
     }).trim()
   }
 
+  /**
+   * Refuses when tracked files outside `except` have changed, and names them. Untracked files
+   * are left out: a pull request only ever stages the paths it is given, so a stray untracked
+   * file cannot end up in it, and on the Actions runner it made every scaffold fail.
+   */
   private requireCleanTree(except: string[]): void {
-    if (this.git(['status', '--porcelain', '--', ...except.map((p) => `:!${p}`)]) !== '') {
+    const dirty = this.git([
+      'status',
+      '--porcelain',
+      '--untracked-files=no',
+      '--',
+      ...except.map((p) => `:!${p}`),
+    ])
+    if (dirty !== '') {
+      const files = dirty
+        .split('\n')
+        .slice(0, 10)
+        .map((l) => l.slice(3))
+        .join(', ')
       throw new UsageError(
-        'The working tree has uncommitted changes. Commit or stash them before opening pull requests.',
+        `The working tree has uncommitted changes (${files}). Commit or stash them before opening pull requests.`,
       )
     }
   }
@@ -204,6 +230,21 @@ export class GhCli implements Gh {
     }
   }
 
+  /** Runs an invitation call with the admin token, explaining a refusal of the workflow token. */
+  private asAdmin(args: string[]): string {
+    try {
+      return this.gh(args, undefined, this.adminToken || undefined)
+    } catch (e) {
+      const message = (e as Error).message
+      if (!/Resource not accessible by integration|HTTP 403/i.test(message)) throw e
+      throw new Error(
+        this.adminToken
+          ? `${message}. The NEST_ADMIN_TOKEN secret must belong to a repository admin and allow Administration: write.`
+          : `${message}. The workflow token cannot manage invitations: add a NEST_ADMIN_TOKEN secret (a token from a repository admin with Administration: write).`,
+      )
+    }
+  }
+
   collaboratorState(handle: string): CollaboratorState {
     try {
       this.gh(['api', `repos/${this.slug}/collaborators/${handle}`])
@@ -211,12 +252,14 @@ export class GhCli implements Gh {
     } catch (e) {
       if (!/404|Not Found/i.test((e as Error).message)) throw e
     }
-    const invited = this.ghJson(['api', `repos/${this.slug}/invitations?per_page=100`, '--paginate'])
+    const invited = JSON.parse(
+      this.asAdmin(['api', `repos/${this.slug}/invitations?per_page=100`, '--paginate']) || '[]',
+    ) as Json
     return invited.some((i) => i.invitee?.login?.toLowerCase() === handle.toLowerCase()) ? 'invited' : 'none'
   }
 
   inviteCollaborator(handle: string, permission: 'push'): void {
-    this.gh([
+    this.asAdmin([
       'api',
       '-X',
       'PUT',

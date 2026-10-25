@@ -55,6 +55,9 @@ jobs:
       - name: Enrol
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # only for the collaborator invitation, which the workflow token is not allowed to send:
+          # a token from a repository admin with Administration: write (see docs/ENROLMENT.md)
+          NEST_ADMIN_TOKEN: ${{ secrets.NEST_ADMIN_TOKEN }}
         run: node packages/cli/bin/nest.js enroll "$HANDLE" --name "$NAME" --cohort "$COHORT" --gh
       - name: Open or update the failure issue
         if: failure()
