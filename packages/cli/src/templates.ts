@@ -31,22 +31,22 @@ const yamlString = (s: string) =>
 
 export function renderProfile(plan: ScaffoldPlan): string {
   const lines = [
-    '# Your profile. Every field is explained in docs/CONTRIBUTING.md.',
-    '# Keep handle, cohort and joined as they are. Fill in the rest in your own words.',
+    '# Your profile. Fill in name, intro and skills_developing in your own words.',
+    '# Leave handle, cohort and joined as they are; they are set for you. docs/CONTRIBUTING.md explains every field.',
     `handle: ${plan.handle}`,
     `name: ${yamlString(plan.name)}`,
     ...(plan.cohort === null
       ? ['# cohort: none. Set it when you join one, as YYYY-MM.']
       : [`cohort: ${plan.cohort}`]),
     `joined: ${plan.joined}`,
-    'intro: Replace this with one or two sentences about yourself.',
+    'intro: Replace this with one or two sentences about where you are now, not where you want to be.',
     plan.skills.length === 0 ? 'skills_developing: []' : 'skills_developing:',
     ...plan.skills.map((s) => `  - ${yamlString(s)}`),
     ...(plan.next === null ? [] : [`next: ${yamlString(plan.next)}`]),
     'visibility:',
-    '  # Change to public when your page is ready to be seen. You can change it back any time.',
+    '  # private until Stage 2. Change it to public when your page is ready; change it back any time.',
     `  page: ${plan.visibility}`,
-    '# Work accepted by other projects goes here, newest first. Leave it empty until there is some.',
+    '# Work accepted by other projects goes here, newest first, with the merged pull request address. Leave it empty until there is some.',
     'projects: []',
     '',
   ]
@@ -55,10 +55,13 @@ export function renderProfile(plan: ScaffoldPlan): string {
 
 const PLACEHOLDERS: Record<PageSectionTitle, string> = {
   'Where I started':
-    'Replace this paragraph with where you were when you joined: what you could already do, and what brought you here.',
-  'What I learned': 'Replace this paragraph with one thing you learned that you did not expect to.',
-  'What I built': 'Replace this paragraph with what you built, starting with this page.',
-  'What I am working on next': 'Replace this paragraph with what you are working on next and why.',
+    'Replace this paragraph with where you were when you joined: what you could already do, and what brought you here. Two or three sentences are plenty.',
+  'What I learned':
+    'Replace this paragraph with one thing you learned that you did not expect to, or delete this section until you have one.',
+  'What I built':
+    'Replace this paragraph with what you built, starting with this page, or delete this section for now.',
+  'What I am working on next':
+    'Replace this paragraph with what you are working on next and why, or delete this section for now.',
 }
 
 export function renderPage(plan: ScaffoldPlan): string {
@@ -71,12 +74,16 @@ export function renderReadme(plan: ScaffoldPlan, repoUrl: string): string {
     '',
     `This directory belongs to @${plan.handle}. Only its owner edits it; everyone else reviews.`,
     '',
-    '- `profile.yml`: who you are. Validated on every pull request.',
-    '- `page.md`: your page, four short sections.',
-    '- `profile.test.ts`: the tests that guard your page. Stage 4 adds one.',
-    '- `.practice.json`: counts written by a workflow. Never edit it by hand.',
+    'What is here and what to do with it:',
     '',
-    `Run \`npx nest validate\` before you push. Start with the Stage 1 issue: ${repoUrl}/issues?q=is%3Aopen+label%3Astage%3A1+assignee%3A${plan.handle}`,
+    '- `profile.yml`: who you are. Fill it in during Stage 2. Checked on every pull request.',
+    '- `page.md`: your page, four short sections. Fill in "Where I started" during Stage 2.',
+    '- `profile.test.ts`: the tests that guard your page. Stage 4 adds one.',
+    '- `.practice.json`: counts written by a workflow after your pull requests merge. Never edit it by hand.',
+    '',
+    'Before you push: `npm run validate` tells you the file, the line and the field of anything that needs changing.',
+    '',
+    `Your issues, in order: ${repoUrl}/issues?q=is%3Aopen+assignee%3A${plan.handle}+label%3Aonboarding`,
     '',
   ].join('\n')
 }
@@ -98,7 +105,7 @@ export function renderTest(plan: ScaffoldPlan): string {
     '  })',
     '',
     '  // Stage 4: add the test that would have caught the defect you fixed in Stage 3.',
-    '  // It should fail on the broken profile and pass on the fixed one.',
+    '  // Start from the shape of the test above. It should fail with the defect and pass without it.',
     '})',
     '',
   ].join('\n')

@@ -1,34 +1,43 @@
-Hello {{name}}. This is Stage {{stage_number}} of the ladder, {{stage_title}}{{cohort_phrase}}.
+Hello {{name}}. Welcome to Stage {{stage_number}}, {{stage_title}}{{cohort_phrase}}.
 
-## Why this stage exists
+## In one line
 
-A fix without a test is a fix that can come back. In Stage 3 you found something the checks did not cover. Now you write the check, and you prove it works by watching it fail first.
+Turn the sentence you kept from Stage 3 into a test that fails while the defect is there and passes once it is gone. About an hour.
+
+## Why this matters
+
+A test is a claim about behaviour that the machine checks for you. A test that fails before the fix and passes after it is the proof that your Stage 3 guess was right, and it stops the defect coming back. Coverage is a number; a well-chosen assertion is a decision.
+
+## Before you start
+
+- [ ] Your Stage 3 fix has merged, and you have the sentence that says why the checks did not catch it.
+- [ ] `git switch main` and `git pull`.
 
 ## Steps
 
-1. Open `contributors/{{handle}}/profile.test.ts`. The first test there loads your directory with `validateContributor(root, handle)` and asserts that there are no problems. Your new test goes after it and uses the same `result`.
-2. Decide what the test asserts. It should be the one sentence from Stage 3 turned into code. For example, if the problem was a date, the test compares `result.contributor.profile.joined` with something it must be before or after. If the problem was the order of sections, the test compares `result.contributor.page.sections.map((s) => s.title)` with the order you expect. `validateCohort(root, '{{cohort}}')` gives you the cohort's dates if you need them.
-3. Make it fail first. On a branch `stage-4-{{handle}}`, put the Stage 3 defect back temporarily (one line in `profile.yml` or `page.md`), then run:
+1. Open `contributors/{{handle}}/profile.test.ts`. One test is already there: it loads your directory with `validateContributor(root, handle)` and checks for no problems. Your test goes after it and starts from the same shape; copying the shape of an existing test is how everyone writes their first one.
+2. Decide what to assert, in words first. Post one sentence here: "the test checks that ...". Check-in. For example: the joined date is not before the cohort starts, or the sections are in the expected order. `result.contributor.profile` and `result.contributor.page.sections` hold your data; `validateCohort(root, '{{cohort}}')` gives the cohort dates if you need them.
+3. Make it fail first. On a branch `stage-4-{{handle}}`, write the test, then put the Stage 3 defect back for a moment (one line in `profile.yml` or `page.md`) and run:
 
    ```bash
    npx vitest run contributors/{{handle}}
    ```
 
-   Your new test must be the one that fails. If it passes, it is not testing the defect yet.
+   Your new test must be the one that fails. If everything passes, the test is not testing the defect yet. If a different test fails, read which one and why: a test that is wrong looks different from code that is wrong.
 
-4. Remove the defect again. Run the same command. Everything passes.
-5. Commit the test alone: `git commit -am "test: guard against <the defect> on my page"`. The commit should not contain the defect, only the test.
-6. Open a pull request. In the description, paste the failing output from step 3 and the passing output from step 4. `Closes #` and this issue's number. It merges on its own once the checks are green.
+4. Remove the defect again and run the same command. Everything passes. Keep both outputs.
+5. Commit the test alone, not the defect: `git commit -am "test: guard against <the defect> on my page"`.
+6. Open the pull request. Paste the failing output and the passing output in the description, and one sentence on what this test guards and what it does not. `Closes #` and this issue's number. It merges on its own once the checks are green.
 
 ## Done when
 
-- [ ] Your test fails when the defect is present and passes when it is not, and the pull request shows both.
+- [ ] Your test fails with the defect present and passes without it, and the pull request shows both.
 - [ ] The test is merged and runs in CI for every future change to your directory.
 - [ ] You can say what the test guards and what it does not.
 
 ## If you get stuck
 
-Paste your test and the output here. Common snags: forgetting `await` is not needed here (everything is synchronous), or asserting the fix instead of the rule behind it.
+Paste your test and the output here. The two usual snags: asserting the fix instead of the rule behind it, and a test that passes even with the defect because it checks the wrong thing. Ask early; nothing here is counted against you.
 
 <!-- Machine-readable summary read by the Kestrel platform. Keep it in step with the text above. -->
 
@@ -39,10 +48,10 @@ cohort: {{cohort}}
 evidence: practice
 title: {{stage_title}}
 steps:
-  - Add a test to profile.test.ts that asserts the rule behind your Stage 3 defect
+  - Post in words what the test will check
+  - Write the test in profile.test.ts, starting from the shape of the existing one
   - Put the defect back and watch the test fail
-  - Remove the defect and watch it pass
-  - Open a pull request with both outputs
+  - Remove the defect, watch it pass, open a pull request with both outputs
 done_when:
   - The test fails with the defect and passes without it
   - The test is merged and runs in CI

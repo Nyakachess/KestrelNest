@@ -1,16 +1,20 @@
-Hello {{name}}. This is Stage {{stage_number}} of the ladder, {{stage_title}}{{cohort_phrase}}.
+Hello {{name}}. Welcome to Stage {{stage_number}}, {{stage_title}}{{cohort_phrase}}.
 
-## Why this stage exists
+## In one line
 
-Until now every task was handed to you. The last rung is noticing something that should change and making the case for it. After this, the ladder ends and any repository you like begins.
+Notice one thing that should change, look into it, and make the case for it. Then any repository you like.
+
+## Why this matters
+
+Until now every task was handed to you. The last rung is seeing a problem nobody assigned, scoping it, and asking for a decision. That is what contributors do in every project after this one. Maintainer acceptance is not required for this to count; a clear proposal that is declined with reasons is a real outcome.
 
 ## Steps
 
-1. Look back over Stages 1 to 6 and pick one thing that was harder, slower or more confusing than it needed to be. It can be a tool, a document, a check, a message, a step in an issue. Small is good.
-2. Open a new issue with the Proposal template: [new proposal]({{repo_url}}/issues/new?template=proposal.yml). Three parts: the problem (who it affects and how), the proposal (what you would change), and what it costs (what gets harder or has to be maintained).
-3. Link to evidence: the pull request where it bit you, the message you did not understand, the minutes it took. A proposal with evidence gets a faster answer.
-4. Maintainers and cohort members comment. Answer them. Be ready to shrink the proposal; most good ones get smaller before they are accepted.
-5. One of three things happens: it is accepted and becomes an architecture decision record under `docs/adr/` or a good-shared-issue you can take yourself; it is declined with reasons; or it needs more evidence. All three count.
+1. Pick. Look back over Stages 1 to 6 and choose one thing that was harder, slower or more confusing than it needed to be: a tool, a document, a check, a message, a step in an issue. Small is good.
+2. Investigate before writing (10 minutes). Where does it live? What would have to be true for it to be a real problem and not a one-off? Note the evidence: the pull request where it bit you, the message you did not understand, the minutes it took.
+3. Open a proposal: [new proposal]({{repo_url}}/issues/new?template=proposal.yml). Three parts: the problem (who it affects and how), the proposal (what you would change), and what it costs (what gets harder or has to be maintained). Link your evidence.
+4. Answer the comments. Be ready to shrink the proposal; most good ones get smaller before they are accepted.
+5. Get a decision. One of three things happens: accepted, and it becomes a decision record under `docs/adr/` or a good-shared-issue you can take yourself; declined, with reasons; or waiting on something named. All three count.
 6. If it is accepted and you implement it, that is another shared-project contribution.
 
 ## Done when
@@ -32,8 +36,8 @@ cohort: {{cohort}}
 evidence: proposal
 title: {{stage_title}}
 steps:
-  - Pick one thing that was harder than it needed to be
-  - Open a proposal issue with the problem, the proposal and the cost
+  - Pick one thing that was harder than it needed to be and look into it
+  - Open a proposal with the problem, the proposal and the cost, with evidence
   - Answer the comments and shrink it if needed
 done_when:
   - Your proposal has all three parts and evidence

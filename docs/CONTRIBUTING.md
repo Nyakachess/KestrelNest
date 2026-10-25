@@ -1,13 +1,25 @@
 # Contributing to Nest
 
-This guide assumes you have never opened a pull request. If you have, skim the headings and go straight to [Your directory](#your-directory).
+This guide is for someone who has never opened a pull request. If you have, skim the headings and go to [Your directory](#your-directory). The short version of everything below: ask early, record what you actually saw, and say what you think before you look.
+
+## How we work here
+
+These five habits are the whole curriculum. Every stage practises them.
+
+- Orient before you touch. Spend ten minutes finding out what a project does and how it is organised before changing a line.
+- Reproduce before you fix. A fix you cannot trigger is not a fix.
+- Say it before you look. Write down what you think is wrong and how you will check, then check. A written guess finds causes faster than reading code at random, and it is what makes your explanation possible later.
+- Prove it with a test. A test that fails before the fix and passes after is the evidence.
+- Write for someone who was not there. The pull request description is part of the work.
+
+And one norm: asking never costs you anything. A question on your stage issue is answered within a working day, with a question or a hint, never with the answer to the part that is yours. Reasoning is what we look for. A merged pull request is not proof on its own, and a pull request that got a real review and did not merge is not a failure.
 
 ## What you need
 
 - A GitHub account. Your login, in lower case, is your handle here.
 - Git. On Windows install Git for Windows; on macOS run `xcode-select --install`; on Linux use your package manager.
 - Node 20 or newer. Check with `node --version`.
-- A terminal and a text editor. Any editor is fine.
+- A terminal and any text editor.
 
 ## Words you will see
 
@@ -19,6 +31,7 @@ This guide assumes you have never opened a pull request. If you have, skim the h
 - Pull request (PR): asking for your branch to be merged into `main`. This is where review happens.
 - CI: the checks that run on every pull request. Green means they passed.
 - Merge: your change becomes part of `main`. Nothing is live until it merges.
+- Check-in: a short comment on your stage issue at a set point, saying what you saw or what you think. Never graded.
 
 ## 1. Get the code
 
@@ -31,7 +44,7 @@ npm install
 npm test
 ```
 
-`npm install` fetches the dependencies and builds the `nest` command. `npm test` should end with every test passing. If it does not, that is worth a question before you change anything.
+You should see a line ending in "passed". `npm install` also builds the `nest` command. If `npm test` does not pass, that is worth a comment on your stage issue before you change anything.
 
 ## 2. Make a branch
 
@@ -62,7 +75,7 @@ npm run format     # fixes formatting
 npm run lint       # confirms formatting and that no em dash slipped in
 ```
 
-`nest validate` tells you the file, the line, the field and what to change, in that order. Fix what it names and run it again. CI runs exactly these commands, so if they pass here they pass there.
+`nest validate` tells you the file, the line, the field and what to change, in that order. Fix only what it names and run it again. CI runs exactly these commands, so if they pass here they pass there.
 
 ## 5. Commit
 
@@ -79,7 +92,7 @@ The message is one line, present tense, starting with a type: `feat:`, `fix:`, `
 git push -u origin stage-1-your-handle
 ```
 
-Git prints a link. Open it, or go to the repository on GitHub and press "Compare and pull request". Fill in the template: what you changed, how you checked it, which stage issue it closes (write `Closes #123`). Then press "Create pull request".
+Git prints a link. Open it, or go to the repository on GitHub and press "Compare and pull request". The template asks for four things: what changed, why, how you checked it, and what it does not cover. Fill each with something specific to this change. Write `Closes #123` with your stage issue's number, then press "Create pull request".
 
 A draft pull request is fine if you want early feedback. Mark it ready when you are.
 
@@ -87,15 +100,15 @@ A draft pull request is fine if you want early feedback. Mark it ready when you 
 
 1. CI runs `nest validate`, the tests, the build and the formatting check. If something is red, open the failed job, read the first error, fix it on your branch, commit and push again. The pull request updates itself.
 2. A preview of the site is built from your branch, so you can see your page before it is live.
-3. Someone reviews. Comments are about the change, not about you. Reply to each one, make the change or say why not, and push again.
+3. Someone reviews. Comments are about the change, not about you. Reply to each one, make the change or say why not, and push again. Keeping a decision and explaining why is as good an answer as changing it.
 4. Merge. Changes that touch only your own directory merge automatically once CI is green. Anything else is merged by a maintainer after review.
 5. The site redeploys from `main`. Your page is live within a few minutes, if it is public.
 
 ## Your directory
 
-`contributors/your-handle/` is created for you by your cohort lead. It holds:
+`contributors/your-handle/` is created for you when you are enrolled. It holds:
 
-- `profile.yml`: `handle`, `cohort` and `joined` are set for you and stay as they are. Fill in `name`, `intro` (one or two sentences), `skills_developing` (up to eight), and `next` if you like. Set `visibility.page` to `public` when you want your page live; set it back to `private` any time. List work accepted by other projects under `projects`, newest first, with the merged pull request's address. Never list work that is not yours or not merged.
+- `profile.yml`: `handle`, `cohort` and `joined` are set for you and stay as they are. Fill in `name`, `intro` (one or two sentences about where you are now), `skills_developing` (up to eight), and `next` if you like. Set `visibility.page` to `public` when you want your page live; set it back to `private` any time. List work accepted by other projects under `projects`, newest first, with the merged pull request's address. Never list work that is not yours or not merged.
 - `page.md`: four sections under fixed headings: Where I started, What I learned, What I built, What I am working on next. Plain text, a few sentences each. Links to `https://` addresses, bold, italics and inline code work; nothing else does.
 - `profile.test.ts`: the tests that guard your page. The first one checks that your directory validates. Stage 4 adds the one that would have caught your Stage 3 defect.
 - `.practice.json`: counts written by a workflow after your pull requests merge. Do not edit it.
@@ -104,7 +117,7 @@ Your scaffold has one defect planted on purpose. Finding it is Stage 3. Do not g
 
 ## Getting help
 
-- Stuck on git or the terminal: say so in your stage issue. That is what it is for, and the question helps the next person.
+- Stuck on git or the terminal: say so on your stage issue, with the exact command and the exact output. That is what the issue is for, and the question helps the next person.
 - Found a bug in Nest itself: open an issue with what you did, what you expected and what happened. That is real open-source work, and if you fix it, it counts as shared code.
 - Something uncomfortable happened: see [CODE_OF_CONDUCT.md](../CODE_OF_CONDUCT.md).
 

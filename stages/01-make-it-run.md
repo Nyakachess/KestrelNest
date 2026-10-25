@@ -1,13 +1,22 @@
-Hello {{name}}. This is Stage {{stage_number}} of the ladder, {{stage_title}}{{cohort_phrase}}.
+Hello {{name}}. Welcome to Stage {{stage_number}}, {{stage_title}}{{cohort_phrase}}.
 
-## Why this stage exists
+## In one line
 
-Before you change anything, you get the project running on your own machine and make one tiny change that goes through the whole process: branch, commit, push, pull request, review, merge. The change is deliberately small so the process is the only new thing.
+Get Nest running on your own computer, add one line to one file, and take that line through a pull request. About two hours, in pieces, over a few days.
+
+## Why this matters
+
+Your first contribution is tiny on purpose. The only new thing here is the loop every contribution follows: branch, commit, push, pull request, review, merge. Once you have done the loop once, every later stage is the same loop with more inside it.
+
+## Before you start
+
+- [ ] Accept the collaborator invitation GitHub emailed you. Nothing below works until you do. If you cannot find the email, open {{repo_url}}/invitations.
+- [ ] Install Git and Node 20 or newer. [docs/DEVELOPMENT.md]({{repo_url}}/blob/main/docs/DEVELOPMENT.md) says how, for each operating system.
+- [ ] Skim [docs/CONTRIBUTING.md]({{repo_url}}/blob/main/docs/CONTRIBUTING.md) once. It explains every word used below.
 
 ## Steps
 
-1. Read [docs/CONTRIBUTING.md]({{repo_url}}/blob/main/docs/CONTRIBUTING.md) once, top to bottom. It explains every word used below.
-2. Clone the repository and install it:
+1. Get the code and make it run (20 minutes):
 
    ```bash
    git clone {{repo_url}}.git
@@ -16,16 +25,17 @@ Before you change anything, you get the project running on your own machine and 
    npm test
    ```
 
-   Every test should pass. If one does not, say so in a comment here with the output; that is a real finding.
+   You should see a line ending in "passed". Write down anything you had to do that these four commands did not say, and post it as a comment here. That is a real finding, not a complaint, and it often becomes a documentation fix.
 
-3. Make a branch: `git switch -c stage-1-{{handle}}`.
-4. Open `CONTRIBUTORS.md` and add this line at the end: `- @{{handle}}`.
-5. Run `npm run lint`. If it complains, run `npm run format` and look at what it changed.
-6. Commit: `git commit -am "docs: add {{handle}} to CONTRIBUTORS"`.
-7. Push and open a pull request: `git push -u origin stage-1-{{handle}}`, then follow the link git prints. In the description write `Closes #` followed by this issue's number.
-8. Watch the checks. Green: wait for a maintainer to review and merge. Red: open the failed job, read the first error, fix it, push again.
+2. Look around before you change anything (10 minutes). Open `README.md` and `docs/DEVELOPMENT.md`. Then post three sentences as a comment on this issue: what Nest does, how the code is organised, and where your own directory will live. This is the first check-in. Nobody grades it; it is the habit of orienting before touching.
+3. Make a branch: `git switch -c stage-1-{{handle}}`. A branch is a safe place to work; `main` stays untouched.
+4. Open `CONTRIBUTORS.md` and add this line at the very end: `- @{{handle}}`.
+5. Run `npm run lint`. If it complains, run `npm run format` and look at what it changed. That is the formatter, and it will catch you out once; everyone it does.
+6. Commit: `git commit -am "docs: add {{handle}} to CONTRIBUTORS"`. The message says what the change does, in one line.
+7. Push and open the pull request: `git push -u origin stage-1-{{handle}}`, then follow the link git prints. In the description, write `Closes #` followed by this issue's number.
+8. Watch the checks on the pull request. Red: open the failed job, read the first error (not the last), fix it on your branch, commit and push again. Green: a maintainer reviews and merges. If they leave a comment, reply to it, even if only to say you changed it.
 
-A separate draft pull request titled "Scaffold for @{{handle}}" already exists. A maintainer merges it; you do not need to touch it. After it merges, `contributors/{{handle}}/` is yours.
+A draft pull request titled "Scaffold for @{{handle}}" already exists in your name. It is Stage 2. Leave it alone for now.
 
 ## Done when
 
@@ -36,7 +46,15 @@ A separate draft pull request titled "Scaffold for @{{handle}}" already exists. 
 
 ## If you get stuck
 
-Comment here with the exact command you ran and the exact text it printed. Being stuck at this stage is normal; the question helps the next person too.
+Ask early. Asking never costs you anything here. Comment with the exact command you ran and the exact text it printed, not a summary of it. Being stuck at this stage is normal, and your question helps the next person.
+
+## Words used here
+
+- Clone: your own copy of the project on your computer.
+- Branch: a named line of work, separate from `main`.
+- Commit: a saved step with a one-line message.
+- Pull request: asking for your branch to be merged into `main`; where review happens.
+- CI: the checks that run on every pull request.
 
 <!-- Machine-readable summary read by the Kestrel platform. Keep it in step with the text above. -->
 
@@ -48,9 +66,9 @@ evidence: practice
 title: {{stage_title}}
 steps:
   - Accept the collaborator invitation GitHub emailed you, then clone the repo
-  - Run npm install and npm test
-  - Add your handle to CONTRIBUTORS.md on a branch
-  - Open a pull request and get it merged
+  - Run npm install and npm test, and note anything the commands did not say
+  - Post three sentences on what Nest is and where your directory lives
+  - Add your handle to CONTRIBUTORS.md on a branch and open a pull request
 done_when:
   - Accept the collaborator invitation GitHub emailed you, then clone the repo
   - npm test passes on your machine

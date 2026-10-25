@@ -13,5 +13,5 @@ describe('contributors/_example', () => {
   })
 
   // Stage 4: add the test that would have caught the defect you fixed in Stage 3.
-  // It should fail on the broken profile and pass on the fixed one.
+  // Start from the shape of the test above. It should fail with the defect and pass without it.
 })
