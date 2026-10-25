@@ -45,6 +45,8 @@ A week after enrolment with no commit from them, the Onboarding workflow leaves 
 
 Their stage issues are created while the invitation is still pending, and GitHub drops an assignee who has no access yet. Every half hour (or at once on a `repository_dispatch` of type `upkeep`) the Onboarding workflow's `stage-upkeep` job assigns each open, unassigned stage issue to its owner once they are a collaborator.
 
+Enrolment opens the stage issues with the workflow's own token, so their author is `github-actions[bot]`. Kestrel trusts an onboarding issue opened by `github-actions[bot]` and reserves its ticket for the handle in the block straight away, without waiting for the assignment (Kestrel decision D-42); an onboarding issue opened by anyone else still needs that handle as an assignee. So keep the issue step on the workflow token: opening stage issues with a personal token would make Kestrel wait for the assignment again.
+
 ## The invitation token
 
 The workflow's own token is not allowed to read or send repository invitations ("Resource not accessible by integration"). Add a repository secret `NEST_ADMIN_TOKEN`: a fine-grained token from a repository admin, limited to this repository, with **Administration: read and write**. `enroll.yml` uses it for the invitation and nothing else, so issues and pull requests are still opened by the bot. Without it, step c fails with a message that names the secret.

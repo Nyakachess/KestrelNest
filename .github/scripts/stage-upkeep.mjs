@@ -1,7 +1,8 @@
 // Upkeep of the personal stage issues (see packages/cli/src/stage-upkeep.ts):
 //   1. assign each open, unassigned stage issue to its owner once they are a collaborator
 //      (enrolment creates the issues while the invitation is pending, and GitHub drops an
-//      assignee who has no access yet; Kestrel only reserves a ticket for the assignee);
+//      assignee who has no access yet; Kestrel no longer waits for it on issues the bot
+//      opened, D-42, but the assignment keeps GitHub's own views right);
 //   2. on every run, put the current kestrel-ticket block from stages/ into every open stage
 //      issue whose block differs, so a template change reaches Kestrel with nobody running
 //      anything by hand.
