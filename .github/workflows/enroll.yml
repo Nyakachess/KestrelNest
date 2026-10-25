@@ -1,0 +1,70 @@
+name: Enrol
+
+# Kestrel sends a repository_dispatch of type "enroll" with client_payload { handle, name, cohort }.
+# A maintainer can run the same thing for one person from the Actions tab.
+on:
+  repository_dispatch:
+    types: [enroll]
+  workflow_dispatch:
+    inputs:
+      handle:
+        description: GitHub login of the person to enrol
+        required: true
+        type: string
+      name:
+        description: Display name
+        required: true
+        type: string
+      cohort:
+        description: Cohort id as YYYY-MM, or none
+        required: true
+        type: string
+        default: none
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: enroll-${{ github.event.client_payload.handle || inputs.handle }}
+  cancel-in-progress: false
+
+jobs:
+  enroll:
+    runs-on: ubuntu-latest
+    env:
+      HANDLE: ${{ github.event.client_payload.handle || inputs.handle }}
+      NAME: ${{ github.event.client_payload.name || inputs.name }}
+      COHORT: ${{ github.event.client_payload.cohort || inputs.cohort }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Build the CLI
+        run: npx tsc -b
+      - name: Git identity for the bot
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - name: Enrol
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node packages/cli/bin/nest.js enroll "$HANDLE" --name "$NAME" --cohort "$COHORT" --gh
+      - name: Open or update the failure issue
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: node .github/scripts/enrol-failure.mjs report
+      - name: Close an earlier failure issue
+        if: success()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: node .github/scripts/enrol-failure.mjs close
