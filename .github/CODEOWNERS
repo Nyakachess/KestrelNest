@@ -3,3 +3,6 @@
 # in practice: the auto-merge workflow merges a pull request on its own when every changed
 # file is inside the author's own contributors/<login>/ directory and CI is green.
 * @Nyakachess
+
+# Contributor directories, one line each, kept sorted. Added by nest enroll.
+/contributors/anod-a/ @anod-a
