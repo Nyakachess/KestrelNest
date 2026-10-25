@@ -1,1 +1,21 @@
 export const CLI_VERSION = '0.1.0'
+
+export { parseArgs, UsageError } from './args.js'
+export { findRoot, readConfig, type RepoConfig } from './root.js'
+export * from './templates.js'
+export * from './defects.js'
+export * from './issue-body.js'
+export * from './gh.js'
+export * from './gh-fakes.js'
+export * from './io.js'
+export { scaffold, planScaffold, type ScaffoldOptions, type ScaffoldResult } from './commands/scaffold.js'
+export { runValidate } from './commands/validate.js'
+export { runFeed } from './commands/feed.js'
+export { runNewTask, contributorVars, type NewTaskOptions } from './commands/new-task.js'
+export {
+  openCohort,
+  scaffoldBranch,
+  scaffoldPrTitle,
+  type OpenCohortOptions,
+  type OpenCohortReport,
+} from './commands/open-cohort.js'
