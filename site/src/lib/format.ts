@@ -15,7 +15,14 @@ export function formatRange(start: string, end: string): string {
   return ys === ye ? `${left} to ${right}` : `${left}, ${ys} to ${right}`
 }
 
-export const TONES = ['var(--teal)', 'var(--teal-mid)', 'var(--orange)', 'var(--teal-deep)', 'var(--green)']
+/** Avatar fills from the logo palette; the raw cyan is left out because white text fails on it. */
+export const TONES = [
+  'var(--accent)',
+  'var(--primary)',
+  'var(--primary-deep)',
+  'var(--success)',
+  'var(--accent-ink)',
+]
 
 /** A stable avatar colour per handle. */
 export function tone(handle: string): string {

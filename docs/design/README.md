@@ -1,11 +1,7 @@
 # Design references
 
-These three pages are the visual reference for the Nest site. The CSS is inlined in each file: lift token values and component styles from here rather than inventing new ones.
+The site follows design scope v1, the logo palette: see [design-scope-v1.md](design-scope-v1.md) for the tokens, type, foundations and components as Nest uses them, and `docs/adr/0008-visual-system-v2.md` for the decision.
 
-- `nest-home.html`: the home page as it looks once pages exist. The zero-pages state (day one) is derived from it, see docs/BUILD-LOG.md.
-- `nest-profile.html`: a contributor page.
-- `nest-cohort.html`: a cohort page.
+The three HTML pages here are the first design (the pre-logo brand sheet) and are kept as history. The redesign acceptance screens, fourteen captures at 1280 and 390, are kept outside git as `docs/nest-redesign-screens.zip`; the current captures of the real site live in `docs/screenshots/` and are regenerated whenever the site changes.
 
-The people, counts and release numbers in these files are illustrations only. Nothing in them is committed as data anywhere in this repo.
-
-The PNG screens (`screens/*.png`) that the build prompts mention were not supplied; the HTML files are the source of truth.
+The people, counts and release numbers in any of these files are illustrations only. Nothing in them is committed as data anywhere in this repo.

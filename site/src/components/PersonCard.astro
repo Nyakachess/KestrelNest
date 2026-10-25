@@ -1,41 +1,30 @@
 ---
-import { initials, stagesDone, STAGE_COUNT, type Contributor } from '@nest/schema'
-import { pageUrl } from '@nest/schema'
+import { initials, pageUrl, stagesDone, STAGE_COUNT, type Contributor } from '@nest/schema'
 import { SITE } from '../lib/data'
 import { tone } from '../lib/format'
 import Marker from './Marker.astro'
 
-type Props = { contributor: Contributor; counts?: 'pills' | 'markers' }
-const { contributor: c, counts = 'pills' } = Astro.props
+type Props = { contributor: Contributor }
+const { contributor: c } = Astro.props
 const external = c.profile.projects.length
 const shared = c.practice.shared
 const practice = c.practice.practice
 const href = new URL(pageUrl(SITE.url, c.handle)).pathname
 ---
 
-<a href={href} class="card card-tight card-link person-card" aria-label={`${c.profile.name}, contributor page`}>
-  <div class="avatar" style={`background: ${tone(c.handle)}`} aria-hidden="true">{initials(c.profile.name)}</div>
-  <div style="font-weight: 700; font-size: 15px">{c.profile.name}</div>
-  <div class="muted" style="font-size: 12.5px">{c.profile.intro}</div>
+<a href={href} class="card card-link person-card" aria-label={`${c.profile.name}, contributor page`}>
+  <div class="who">
+    <div class="avatar" style={`background: ${tone(c.handle)}`} aria-hidden="true">{initials(c.profile.name)}</div>
+    <div>
+      <div class="name">{c.profile.name}</div>
+      <div class="handle">@{c.handle}</div>
+    </div>
+  </div>
+  <p class="intro">{c.profile.intro}</p>
   <div class="counts">
-    {
-      counts === 'pills' ? (
-        external + shared > 0 ? (
-          <>
-            {external > 0 && <span class="pill pill-green">{external} external</span>}
-            {shared > 0 && <span class="pill pill-teal">{shared} shared</span>}
-          </>
-        ) : (
-          <span class="pill pill-dashed">Stage {stagesDone(c.practice)} of {STAGE_COUNT}</span>
-        )
-      ) : (
-        <>
-          {external > 0 && <Marker kind="external" count={external} />}
-          {shared > 0 && <Marker kind="shared" count={shared} />}
-          {practice > 0 && <Marker kind="practice" count={practice} />}
-          {external + shared + practice === 0 && <span class="pill pill-dashed">Stage {stagesDone(c.practice)} of {STAGE_COUNT}</span>}
-        </>
-      )
-    }
+    {external > 0 && <Marker kind="external" count={external} />}
+    {shared > 0 && <Marker kind="shared" count={shared} />}
+    {practice > 0 && <Marker kind="practice" count={practice} />}
+    {external + shared + practice === 0 && <span class="pill">Stage {stagesDone(c.practice)} of {STAGE_COUNT}</span>}
   </div>
 </a>

@@ -1,7 +1,6 @@
 ---
 import { initials, STAGE_COUNT, stagesDone, type Contributor } from '@nest/schema'
 import Ladder from '../../../components/Ladder.astro'
-import Marker from '../../../components/Marker.astro'
 import Base from '../../../layouts/Base.astro'
 import { cohortOf, contributors, SITE } from '../../../lib/data'
 import { formatDate, tone } from '../../../lib/format'
@@ -20,67 +19,60 @@ const done = stagesDone(c.practice)
 const nav = cohort ? [{ href: `/cohorts/${cohort.id}/`, label: `Cohort ${cohort.id}` }] : [{ href: '/cohorts/', label: 'Cohorts' }]
 const action = { href: `${SITE.repoUrl}/tree/main/contributors/${c.handle}`, label: 'Edit on GitHub' }
 const mergedPrs = `${SITE.repoUrl}/pulls?q=is%3Apr+is%3Amerged+author%3A${c.handle}`
+const meta = [`@${c.handle}`, c.profile.cohort ? `cohort ${c.profile.cohort}` : null, `joined ${formatDate(c.profile.joined)}`].filter(Boolean).join(' · ')
 ---
 
-<Base
-  title={`${c.profile.name} on Nest`}
-  description={c.profile.intro}
-  nav={nav}
-  action={action}
-  footerNote="This page is maintained by its owner. Counts come from merged pull requests."
->
-  <main id="main" class="section" style="padding-top: 44px; padding-bottom: 72px">
-    <div class="wrap-narrow">
+<Base title={`${c.profile.name} on Nest`} description={c.profile.intro} nav={nav} action={action} footerNote="This page is maintained by its owner. Counts come from merged pull requests.">
+  <main id="main" class="section">
+    <div class="wrap">
       <section class="grid-12">
-        <div class="span-8" style="display: flex; gap: 22px; align-items: flex-start; flex-wrap: wrap">
+        <div class="span-8 row start" style="gap: 24px">
           <div class="avatar avatar-lg" style={`background: ${tone(c.handle)}`} aria-hidden="true">{initials(c.profile.name)}</div>
           <div style="flex: 1; min-width: 240px">
-            <h1 style="font-size: clamp(26px, 3vw, 34px)">{c.profile.name}</h1>
-            <div class="mono muted mt-1" style="font-size: 11px">@{c.handle}{c.profile.cohort && ` · cohort ${c.profile.cohort}`} · joined {formatDate(c.profile.joined)}</div>
-            <p class="ink2 mt-2" style="font-size: 15.5px; max-width: 56ch">{c.profile.intro}</p>
-            {c.profile.skills_developing.length > 0 && (
-              <div class="chips mt-2">{c.profile.skills_developing.map((s) => <span class="chip">{s}</span>)}</div>
-            )}
+            <h1 class="h-page">{c.profile.name}</h1>
+            <p class="meta-line mt-2">{meta}</p>
+            <p class="lead mt-3" style="max-width: 56ch">{c.profile.intro}</p>
+            {c.profile.skills_developing.length > 0 && <div class="chips mt-3">{c.profile.skills_developing.map((s) => <span class="chip">{s}</span>)}</div>}
           </div>
         </div>
-        <aside class="span-4 card card-tight">
-          <div class="label mb-2">Counted separately</div>
-          <div class="stack" style="gap: 8px; font-size: 13px">
-            <div class="row between"><Marker kind="external" count={external} label={external === 1 ? 'external contribution' : 'external contributions'} /><span class="mono muted" style="font-size: 10px">listed by owner</span></div>
-            <div class="row between"><Marker kind="shared" count={shared} label={shared === 1 ? 'shared-project contribution' : 'shared-project contributions'} /><span class="mono muted" style="font-size: 10px">merged in Nest</span></div>
-            <div class="row between"><Marker kind="practice" count={practice} label={practice === 1 ? 'practice task' : 'practice tasks'} /><span class="mono muted" style="font-size: 10px">own directory</span></div>
+        <aside class="span-4 card">
+          <p class="label">Counted separately</p>
+          <div class="counts-list mt-3">
+            <div class="counts-row"><span class="marker marker-external" aria-hidden="true"></span><span class="n">{external}</span><span>external {external === 1 ? 'contribution' : 'contributions'}</span><span class="src">listed by owner</span></div>
+            <div class="counts-row"><span class="marker marker-shared" aria-hidden="true"></span><span class="n">{shared}</span><span>shared-project {shared === 1 ? 'contribution' : 'contributions'}</span><span class="src">merged in Nest</span></div>
+            <div class="counts-row"><span class="marker marker-practice" aria-hidden="true"></span><span class="n">{practice}</span><span>practice {practice === 1 ? 'task' : 'tasks'}</span><span class="src">own directory</span></div>
           </div>
           {c.profile.next && (
-            <div class="divider mt-2" style="padding-top: 10px">
-              <div class="label label-muted">Next</div>
-              <p class="ink2 mt-1" style="font-size: 12.5px">{c.profile.next}</p>
+            <div class="next-box mt-3">
+              <p class="label label-accent" style="margin: 0">Next</p>
+              <p>{c.profile.next}</p>
             </div>
           )}
         </aside>
       </section>
 
       <section class="mt-5">
-        <div class="label mb-2">Onboarding ladder · {done} of {STAGE_COUNT}</div>
-        <Ladder done={c.practice.stages_done} />
+        <p class="label">Onboarding ladder · {done} of {STAGE_COUNT}</p>
+        <div class="ladder-card mt-3"><Ladder done={c.practice.stages_done} /></div>
       </section>
 
-      <section class="grid-12 mt-5" style="gap: 22px">
-        <div class="span-7 stack" style="gap: 22px">
+      <section class="grid-12 mt-5">
+        <div class="span-7 sections">
           {c.page.sections.map((s) => (
             <div>
-              <h2 style="font-size: 20px; font-weight: 600">{s.title}</h2>
-              <div class="prose ink2 mt-1" style="font-size: 14px" set:html={renderMarkdown(s.body)} />
+              <h2 class="h-statement" style="font-size: 26px">{s.title}</h2>
+              <div class="prose" set:html={renderMarkdown(s.body)} />
             </div>
           ))}
         </div>
         <div class="span-5">
-          <div class="card card-tight">
-            <div class="row between mb-2"><div class="label">What I contributed</div><div class="mono muted" style="font-size: 10px">updated after merges</div></div>
+          <div class="card card-flush">
+            <div class="card-head"><p class="label">What I contributed</p><span class="mono small muted">updated after merges</span></div>
             {c.profile.projects.map((p) => (
               <div class="evidence-row">
                 <span class="marker marker-external" aria-hidden="true"></span>
                 <div>
-                  <div style="font-weight: 700">{p.title}</div>
+                  <div class="title">{p.title}</div>
                   <div class="meta">External · <a href={p.url}>{p.repo}</a> · merged {formatDate(p.merged)} · listed by owner</div>
                 </div>
               </div>
@@ -88,23 +80,17 @@ const mergedPrs = `${SITE.repoUrl}/pulls?q=is%3Apr+is%3Amerged+author%3A${c.hand
             {shared > 0 && (
               <div class="evidence-row">
                 <span class="marker marker-shared" aria-hidden="true"></span>
-                <div>
-                  <div style="font-weight: 700">{shared} merged into shared code</div>
-                  <div class="meta">Shared project · <a href={mergedPrs}>pull requests by @{c.handle}</a></div>
-                </div>
+                <div><div class="title">{shared} merged into shared code</div><div class="meta">Shared project · <a href={mergedPrs}>pull requests by @{c.handle}</a></div></div>
               </div>
             )}
             {practice > 0 && (
               <div class="evidence-row">
                 <span class="marker marker-practice" aria-hidden="true"></span>
-                <div>
-                  <div style="font-weight: 700; color: var(--ink-2)">{practice} merged on this page</div>
-                  <div class="meta">Practice · pull requests in contributors/{c.handle}/</div>
-                </div>
+                <div><div class="title">{practice} merged on this page</div><div class="meta">Practice · pull requests in contributors/{c.handle}/</div></div>
               </div>
             )}
-            {external + shared + practice === 0 && <p class="muted" style="font-size: 12.5px">Nothing merged yet. Counts appear after the first pull request lands.</p>}
-            <p class="muted mt-2" style="font-size: 11.5px">Practice, shared-project and external work are counted separately and shown separately here. External work is listed by the owner. Verification through Kestrel records is not part of this release.</p>
+            {external + shared + practice === 0 && <div class="evidence-row"><div class="muted">Nothing merged yet. Counts appear after the first pull request lands.</div></div>}
+            <div class="card-foot">Practice, shared-project and external work are counted separately and shown separately here. External work is listed by the owner. Verification through Kestrel records is not part of this release.</div>
           </div>
         </div>
       </section>

@@ -3,7 +3,7 @@ type Props = { title: string; className?: string }
 const { title, className = '' } = Astro.props
 ---
 
-<div class={`card card-tight card-dashed empty-card ${className}`}>
+<div class={`card card-dashed empty-card ${className}`}>
   <div class="t">{title}</div>
-  <slot />
+  <div class="b"><slot /></div>
 </div>

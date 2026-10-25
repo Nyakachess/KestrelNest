@@ -1,0 +1,120 @@
+/* The ladder as a stepper: seven dots on a line, each with its stage label, title and short line. */
+.ladder-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: 32px 28px 28px;
+}
+.stepper {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0;
+}
+.step {
+  position: relative;
+  padding-right: 16px;
+  min-width: 0;
+}
+.step .dot {
+  position: relative;
+  z-index: 1;
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  border: 1.5px solid var(--border-strong);
+  background: var(--card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--foreground);
+}
+.step .dot svg {
+  width: 14px;
+  height: 14px;
+}
+.step.done .dot {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+.step.current .dot,
+.step.highlight .dot {
+  border-color: var(--accent);
+  color: var(--accent);
+  border-width: 2px;
+}
+.step.todo .dot {
+  color: var(--muted-fg);
+}
+.step:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 14px;
+  left: 38px;
+  right: 8px;
+  height: 1.5px;
+  background: var(--border);
+}
+.step.done:not(:last-child)::after {
+  background: var(--primary);
+}
+.step .n {
+  margin-top: 16px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted-fg);
+}
+.step .n .tag {
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+.step .t {
+  margin-top: 4px;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--foreground);
+}
+.step .d {
+  margin-top: 4px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--muted-fg);
+}
+@media (max-width: 900px) {
+  .ladder-card {
+    padding: 24px 20px;
+  }
+  .stepper {
+    grid-template-columns: 1fr;
+  }
+  .step {
+    display: grid;
+    grid-template-columns: 30px 1fr;
+    column-gap: 16px;
+    padding: 0 0 24px;
+  }
+  .step:last-child {
+    padding-bottom: 0;
+  }
+  .step .dot {
+    grid-row: 1 / span 3;
+  }
+  .step .n {
+    margin-top: 6px;
+  }
+  .step:not(:last-child)::after {
+    top: 34px;
+    bottom: 4px;
+    left: 14px;
+    right: auto;
+    width: 1.5px;
+    height: auto;
+  }
+}

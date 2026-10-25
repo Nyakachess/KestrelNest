@@ -1,0 +1,169 @@
+/* Site header: wordmark, product label, nav and one action; a top bar with a menu sheet on a phone. */
+.site-header {
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  padding: 12px var(--gutter);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.site-header .wrap {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  text-decoration: none;
+}
+.brand img {
+  height: 36px;
+  width: auto;
+}
+.brand .sep {
+  width: 1px;
+  height: 28px;
+  background: var(--border);
+}
+.brand .product {
+  font-family: var(--font-head);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--primary);
+  letter-spacing: -0.01em;
+}
+.site-nav {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+}
+.site-nav a {
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+  color: var(--ink-2);
+  padding: 6px 0;
+}
+.site-nav a:hover {
+  color: var(--primary);
+}
+.site-nav a[aria-current='page'] {
+  color: var(--primary);
+  box-shadow: inset 0 -2px 0 var(--brand);
+}
+.header-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+}
+.menu-toggle {
+  display: none;
+}
+@media (max-width: 900px) {
+  .site-header .wrap {
+    gap: 12px;
+  }
+  .site-nav,
+  .header-actions {
+    display: none;
+  }
+  .menu-toggle {
+    display: block;
+    margin-left: auto;
+    position: relative;
+  }
+  .menu-toggle summary {
+    list-style: none;
+    cursor: pointer;
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-input);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary);
+  }
+  .menu-toggle summary::-webkit-details-marker {
+    display: none;
+  }
+  .menu-toggle[open] summary {
+    background: var(--primary-soft);
+  }
+  .menu-toggle .menu {
+    position: absolute;
+    right: calc(-1 * var(--gutter));
+    left: auto;
+    width: 100vw;
+    top: calc(100% + 13px);
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 16px var(--gutter) 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .menu-toggle .menu a {
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--ink-2);
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .menu-toggle .menu a:last-of-type {
+    border-bottom: 0;
+  }
+  .menu-toggle .menu .btn {
+    margin-top: 12px;
+    justify-content: center;
+    color: #fff;
+    border-bottom: 0;
+  }
+}
+@media (max-width: 330px) {
+  .brand .sep,
+  .brand .product {
+    display: none;
+  }
+}
+
+/* Footer: a note on the left, three links on the right. */
+.site-footer {
+  border-top: 1px solid var(--border);
+  padding: 28px var(--gutter);
+  background: var(--card);
+}
+.site-footer .wrap {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.site-footer .note {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--muted-fg);
+}
+.site-footer .legal {
+  margin-left: auto;
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  font-size: 15px;
+}
+.site-footer .legal a {
+  color: var(--ink-2);
+  text-decoration: none;
+}
+.site-footer .legal a:hover {
+  color: var(--primary);
+  text-decoration: underline;
+}
+@media (max-width: 600px) {
+  .site-footer .legal {
+    margin-left: 0;
+  }
+}

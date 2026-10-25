@@ -1,24 +1,44 @@
 ---
 import { SHARED_STAGE, STAGES } from '@nest/schema'
 
-/** The seven stages. With `done` it shows progress; without it, the overview with Stage 5 highlighted. */
-type Props = { done?: number[] | undefined; detail?: boolean }
-const { done, detail = false } = Astro.props
+/**
+ * The seven stages as a stepper. With `done`, finished stages are filled, the next one is
+ * marked "Next", the rest are to do. Without it, the overview marks Stage 5 as the skip-in point.
+ */
+type Props = { done?: number[] | undefined }
+const { done } = Astro.props
 const progress = done !== undefined
+const next = progress ? STAGES.find((s) => !done.includes(s.number))?.number : undefined
 ---
 
-<div class="ladder">
+<ol class="stepper" aria-label="The ladder">
   {
     STAGES.map((s) => {
       const isDone = progress && done.includes(s.number)
-      const cls = progress ? (isDone ? 'step done' : 'step todo') : s.number === SHARED_STAGE ? 'step highlight' : 'step'
+      const state = progress ? (isDone ? 'done' : s.number === next ? 'current' : 'todo') : s.number === SHARED_STAGE ? 'highlight' : ''
+      const tag = state === 'current' ? 'Next' : state === 'highlight' ? 'Skip in' : null
       return (
-        <div class={cls}>
-          <div class="n">{progress ? `${s.number}${isDone ? ' ✓' : ''}` : `Stage ${s.number}`}</div>
+        <li class={`step ${state}`}>
+          <span class="dot" aria-hidden="true">
+            {isDone ? (
+              <svg viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3 3 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            ) : (
+              s.number
+            )}
+          </span>
+          <div class="n">
+            Stage {s.number}{isDone && <span class="sr-only">, done</span>}
+            {tag && <span class="tag"> · {tag}</span>}
+          </div>
           <div class="t">{s.title}</div>
-          {detail && <div class="d">{s.short}</div>}
-        </div>
+          <div class="d">{s.short}</div>
+        </li>
       )
     })
   }
-</div>
+</ol>
+
+<style>
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  ol.stepper { list-style: none; margin: 0; padding: 0; }
+</style>

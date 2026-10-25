@@ -9,28 +9,39 @@ const summaries = cohorts.map(summarize)
 const nav = [
   { href: '/cohorts/', label: 'Cohorts', current: true },
   { href: `${SITE.repoUrl}/blob/main/docs/roadmap.md`, label: 'Roadmap' },
+  { href: `${SITE.repoUrl}/blob/main/docs/CONTRIBUTING.md`, label: 'Contributing' },
 ]
 ---
 
 <Base title="Cohorts on Nest" description="Every Nest cohort, with the contributor pages its members have published." nav={nav}>
-  <main id="main" class="section" style="padding-top: 44px; padding-bottom: 72px">
+  <main id="main" class="section">
     <div class="wrap">
-      <span class="eyebrow">Cohorts</span>
-      <h1 class="mt-2" style="font-size: clamp(26px, 3vw, 34px)">One cohort at a time.</h1>
-      <p class="ink2 mt-2" style="max-width: 56ch">A cohort is a group that starts the ladder together. Its page lists the member pages that have been published, and nothing about the members who have not.</p>
-      <div class="grid grid-3 mt-4">
+      <p class="label">Cohorts</p>
+      <h1 class="h-page mt-2">One cohort at a time.</h1>
+      <p class="lead mt-3" style="max-width: 60ch">A cohort is a group that starts the ladder together. Its page lists the member pages that have been published, and nothing about the members who have not.</p>
+      <div class="grid grid-3 mt-5">
         {
           summaries.length > 0 ? (
-            summaries.map((s) => (
-              <a href={`/cohorts/${s.cohort.id}/`} class="card card-tight card-link">
-                <div class="label">{s.cohort.id}</div>
-                <div class="mt-1" style="font-weight: 700; font-size: 16px">{cohortDisplayName(s.cohort.id)}</div>
-                <div class="mono muted mt-1" style="font-size: 11px">{formatRange(s.cohort.starts, s.cohort.ends)}</div>
-                <div class="muted mt-2" style="font-size: 12.5px">{plural(s.cohort.members.length, 'member')} · {plural(s.published.length, 'page')} published</div>
-              </a>
-            ))
+            summaries.map((s) => {
+              const pct = s.cohort.members.length ? Math.round((s.published.length / s.cohort.members.length) * 100) : 0
+              return (
+                <a href={`/cohorts/${s.cohort.id}/`} class="card card-link cohort-card">
+                  <div class="top">
+                    <span class="pill">{s.cohort.id}</span>
+                    <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10h12m-5-5 5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                  </div>
+                  <div class="title">{cohortDisplayName(s.cohort.id)}</div>
+                  <div class="dates">
+                    <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="2" y="3" width="12" height="11" rx="2" stroke="currentColor" stroke-width="1.3"></rect><path d="M2 7h12M5 1.5v3M11 1.5v3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"></path></svg>
+                    {formatRange(s.cohort.starts, s.cohort.ends)}
+                  </div>
+                  <div class="meta"><span>{plural(s.cohort.members.length, 'member')}</span><span class="pub">{plural(s.published.length, 'page')} published</span></div>
+                  <div class="bar-track" aria-hidden="true"><div class="bar-fill" style={`width: ${pct}%`}></div></div>
+                </a>
+              )
+            })
           ) : (
-            <EmptyCard title="No cohort has been opened yet." className="span-2">
+            <EmptyCard title="No cohort has been opened yet." className="span-all">
               The first cohort appears here once its cohort.yml is merged and the pages start to be published.
             </EmptyCard>
           )

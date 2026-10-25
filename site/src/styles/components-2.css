@@ -1,0 +1,239 @@
+/* The code panel, evidence, empty states, features, prose, cohort cards, the back link and the 404. */
+.code-panel {
+  background: var(--primary-deep);
+  border-radius: var(--radius-card);
+  color: #e6f6f7;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.9;
+  overflow: hidden;
+}
+.code-panel .bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.code-panel .bar .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+}
+.code-panel .bar .file {
+  margin-left: 10px;
+  font-size: 12px;
+  color: var(--brand);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.code-panel .body {
+  padding: 20px;
+}
+.code-panel .in {
+  padding-left: 16px;
+}
+.code-panel .k {
+  color: #9fd9d7;
+}
+.code-panel .hl {
+  color: var(--brand);
+}
+.code-panel .ft {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 14px 20px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.18);
+  font-size: 12px;
+}
+.code-panel .ok {
+  color: var(--brand);
+}
+.code-panel .live {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #fff;
+}
+.code-panel .live::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--accent);
+}
+
+.evidence-row {
+  display: flex;
+  gap: 14px;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.evidence-row:last-of-type {
+  border-bottom: 0;
+}
+.evidence-row .marker {
+  margin-top: 7px;
+}
+.evidence-row .title {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+.evidence-row .meta {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--muted-fg);
+  margin-top: 6px;
+  line-height: 1.7;
+}
+
+.empty-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 40px 24px;
+  min-height: 160px;
+}
+.empty-card .t {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--foreground);
+  margin-bottom: 6px;
+}
+.empty-card .b {
+  color: var(--muted-fg);
+  font-size: 15px;
+  max-width: 46ch;
+}
+
+.feature {
+  border-top: 2px solid var(--primary);
+  padding-top: 20px;
+}
+.feature h3 {
+  font-family: var(--font-head);
+  font-size: 20px;
+  font-weight: 600;
+}
+.feature p {
+  color: var(--ink-2);
+  margin-top: 12px;
+}
+
+.prose p {
+  margin: 0 0 10px;
+}
+.prose p:last-child {
+  margin-bottom: 0;
+}
+.prose ul {
+  margin: 0 0 10px;
+  padding-left: 20px;
+}
+.prose code {
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+  background: var(--primary-soft);
+  color: var(--primary);
+  border-radius: 5px;
+  padding: 1px 6px;
+}
+.sections {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+.sections .prose {
+  color: var(--ink-2);
+  margin-top: 12px;
+  font-size: 16px;
+}
+
+.cohort-card .top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.cohort-card .top svg {
+  width: 18px;
+  height: 18px;
+  color: var(--muted-fg);
+}
+.cohort-card .title {
+  font-family: var(--font-head);
+  font-size: 22px;
+  font-weight: 600;
+  margin-top: 14px;
+}
+.cohort-card .dates {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--muted-fg);
+  margin-top: 8px;
+}
+.cohort-card .dates svg {
+  width: 14px;
+  height: 14px;
+}
+.cohort-card .meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+.cohort-card .meta .pub {
+  color: var(--primary);
+  font-weight: 600;
+}
+.bar-track {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--primary-soft);
+  margin-top: 10px;
+  overflow: hidden;
+}
+.bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: var(--brand);
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+}
+.back-link svg {
+  width: 16px;
+  height: 16px;
+}
+.numerals {
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: clamp(96px, 18vw, 160px);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--primary-soft);
+}
+.numerals .o {
+  color: var(--accent);
+}
+.meta-line {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--primary);
+}

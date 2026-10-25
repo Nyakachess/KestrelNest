@@ -9,3 +9,4 @@ coverage/
 .DS_Store
 Thumbs.db
 npm-debug.log*
+docs/nest-redesign-screens.zip

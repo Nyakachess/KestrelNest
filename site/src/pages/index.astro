@@ -6,11 +6,11 @@ import Base from '../layouts/Base.astro'
 import { byActivity, cohorts, contributors, SITE } from '../lib/data'
 import { plural } from '../lib/format'
 
-const recent = byActivity(contributors).slice(0, 4)
+const recent = byActivity(contributors).slice(0, 3)
 const first = recent[0]
 const learnerLink = first
-  ? { href: `/p/${first.handle}/`, label: "See a learner's page" }
-  : { href: `${SITE.repoUrl}/tree/main/contributors/_example`, label: 'See the page template' }
+  ? { href: `/p/${first.handle}/`, label: "See a learner's page", external: false }
+  : { href: `${SITE.repoUrl}/tree/main/contributors/_example`, label: 'See the page template', external: true }
 const stageOne = `${SITE.repoUrl}/issues?q=is%3Aopen+label%3Astage%3A1`
 const description =
   "Nest is Kestrel Collective's open-source onboarding project. Every new contributor builds a portfolio page here through real pull requests, and it keeps growing with every verified contribution they make anywhere."
@@ -18,59 +18,71 @@ const description =
 
 <Base title="Nest: a starter project that grows with you" description={description}>
   <main id="main">
-    <section class="section-hero">
+    <section class="section">
       <div class="wrap grid-12 center">
         <div class="span-7">
-          <span class="eyebrow">A starter project that grows with you</span>
-          <h1 class="mt-2" style="font-size: clamp(32px, 4vw, 44px)">Your first open-source contributions, in a codebase built for them.</h1>
-          <p class="lead mt-3" style="max-width: 54ch; font-size: 16px">
+          <span class="eyebrow-pill">A starter project that grows with you</span>
+          <h1 class="display mt-3">Your first <span class="nowrap">open-source</span> contributions, in a codebase <span class="accent">built for them.</span></h1>
+          <p class="lead mt-3" style="max-width: 56ch">
             Nest is a real, maintained open-source project. Every new Kestrel contributor gets a page here that they build themselves, pull request by pull request, and that keeps growing with every verified contribution they make anywhere.
           </p>
           <div class="row mt-4">
-            <a href={stageOne} class="btn btn-primary">Start with Stage 1</a>
-            <a href={learnerLink.href} class="btn btn-secondary">{learnerLink.label}</a>
+            <a href={stageOne} class="btn btn-accent btn-lg">Start with Stage 1 <span class="arrow" aria-hidden="true">&#8599;</span></a>
+            <a href={learnerLink.href} class="btn btn-secondary btn-lg">{learnerLink.label} {learnerLink.external && <span class="arrow" aria-hidden="true">&#8599;</span>}</a>
           </div>
-          <div class="row mt-4 mono muted" style="gap: 22px; font-size: 11px">
-            <span><b style="color: var(--ink); font-size: 15px">{contributors.length}</b> contributor {contributors.length === 1 ? 'page' : 'pages'}</span>
-            <span><b style="color: var(--ink); font-size: 15px">{cohorts.length}</b> {cohorts.length === 1 ? 'cohort' : 'cohorts'}</span>
-            <span><b style="color: var(--ink); font-size: 15px">v{SITE.release}</b> latest release</span>
+          <div class="hairline mt-4"></div>
+          <div class="stats-row mt-3">
+            <span><b>{contributors.length}</b>contributor {contributors.length === 1 ? 'page' : 'pages'}</span>
+            <span><b>{cohorts.length}</b>{cohorts.length === 1 ? 'cohort' : 'cohorts'}</span>
+            <span><b>v{SITE.release}</b>latest release</span>
           </div>
         </div>
-        <div class="span-5 code-panel" aria-label="Example profile file">
-          <div class="hd">contributors/your-login/profile.yml</div>
-          <div><span class="k">handle:</span> your-login</div>
-          <div><span class="k">name:</span> Your Name</div>
-          <div><span class="k">cohort:</span> 2027-01</div>
-          <div><span class="k">skills_developing:</span></div>
-          <div class="in">- debugging</div>
-          <div class="in">- reading unfamiliar code</div>
-          <div><span class="k">visibility:</span></div>
-          <div class="in"><span class="k">page:</span> public</div>
-          <div class="ft">&#10003; validate · &#10003; build · preview deployed</div>
+        <div class="span-5">
+          <div class="code-panel" aria-label="Example profile file">
+            <div class="bar">
+              <span class="dot" style="background: var(--accent)"></span><span class="dot" style="background: var(--brand)"></span><span class="dot" style="background: #6b8a8d"></span>
+              <span class="file">contributors/your-login/profile.yml</span>
+            </div>
+            <div class="body">
+              <div><span class="k">handle:</span> your-login</div>
+              <div><span class="k">name:</span> Your Name</div>
+              <div><span class="k">cohort:</span> <span class="hl">2027-01</span></div>
+              <div><span class="k">skills_developing:</span></div>
+              <div class="in">- debugging</div>
+              <div class="in">- reading unfamiliar code</div>
+              <div><span class="k">visibility:</span></div>
+              <div class="in"><span class="k">page:</span> public</div>
+            </div>
+            <div class="ft"><span class="ok">&#10003; validate</span><span class="ok">&#10003; build</span><span class="live">preview deployed</span></div>
+          </div>
         </div>
       </div>
     </section>
 
-    <section class="section" style="padding-top: 20px">
+    <section class="section">
       <div class="wrap">
-        <div class="label mb-2">The ladder · an invitation, not a gate</div>
-        <Ladder detail />
-        <p class="muted mt-2" style="font-size: 12.5px">Experienced already? Skip to Stage 5 or straight to the Kestrel board. Nothing here is required for anything else.</p>
+        <p class="label">The ladder · an invitation, not a gate</p>
+        <h2 class="h-statement mt-2">Seven stages, from first clone to your own proposal.</h2>
+        <div class="ladder-card mt-4"><Ladder /></div>
+        <p class="muted mt-3">Experienced already? Skip to Stage 5 or straight to the <a href={SITE.landingUrl}>Kestrel board</a>. Nothing here is required for anything else.</p>
       </div>
     </section>
 
-    <section class="section" style="padding-top: 20px">
+    <section class="section">
       <div class="wrap">
-        <div class="row between mb-2">
-          <div class="label">{first ? `Recent pages · ${plural(contributors.length, 'page')}` : 'Pages'}</div>
-          <a href="/cohorts/" style="font-size: 12.5px; font-weight: 700">All cohorts &#8594;</a>
+        <div class="row between end">
+          <div>
+            <p class="label">{first ? `Recent pages · ${plural(contributors.length, 'page')}` : 'Pages'}</p>
+            <h2 class="h-statement mt-2">Built by the people on them.</h2>
+          </div>
+          <a href="/cohorts/" class="more">All cohorts <span class="arrow" aria-hidden="true">&#8594;</span></a>
         </div>
-        <div class="grid grid-4">
+        <div class="grid grid-3 mt-4">
           {
             first ? (
               recent.map((c) => <PersonCard contributor={c} />)
             ) : (
-              <EmptyCard title="The first pages are being built right now." className="span-2">
+              <EmptyCard title="The first pages are being built right now." className="span-all">
                 Pages appear here when their owners publish them. The project is open to clone now.
               </EmptyCard>
             )
@@ -79,11 +91,11 @@ const description =
       </div>
     </section>
 
-    <section class="section" style="padding-top: 20px; padding-bottom: 64px">
-      <div class="wrap grid grid-3">
-        <div class="card"><div class="label">A real project</div><p class="ink2 mt-1" style="font-size: 13px">CI on every PR, previews, CODEOWNERS, ADRs, a public roadmap and quarterly releases. The same workflow you will meet everywhere else.</p></div>
-        <div class="card"><div class="label">Evidence, labelled honestly</div><p class="ink2 mt-1" style="font-size: 13px">Pages separate practice in your own directory, contributions to Nest's shared code, and work accepted by other projects. Nothing is dressed up as more than it is.</p></div>
-        <div class="card"><div class="label">Yours, for good</div><p class="ink2 mt-1" style="font-size: 13px">Publish what you choose, edit forever, unpublish with one PR. Your page keeps growing after onboarding ends, from verified work, wherever you do it.</p></div>
+    <section class="section">
+      <div class="wrap grid grid-3" style="gap: 28px">
+        <div class="feature"><h3>A real project</h3><p>CI on every PR, previews, CODEOWNERS, ADRs, a public roadmap and quarterly releases. The same workflow you will meet everywhere else.</p></div>
+        <div class="feature"><h3>Evidence, labelled honestly</h3><p>Pages separate practice in your own directory, contributions to Nest's shared code, and work accepted by other projects. Nothing is dressed up as more than it is.</p></div>
+        <div class="feature"><h3>Yours, for good</h3><p>Publish what you choose, edit forever, unpublish with one PR. Your page keeps growing after onboarding ends, from verified work, wherever you do it.</p></div>
       </div>
     </section>
   </main>

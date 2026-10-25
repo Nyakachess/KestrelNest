@@ -4,17 +4,17 @@ import { SITE } from '../lib/data'
 ---
 
 <Base title="Page not found on Nest" description="This page does not exist on Nest.">
-  <main id="main" class="section" style="padding-top: 64px; padding-bottom: 96px">
-    <div class="wrap-narrow">
-      <span class="eyebrow">404</span>
-      <h1 class="mt-2" style="font-size: clamp(26px, 3vw, 34px)">There is no page here.</h1>
-      <p class="ink2 mt-2" style="max-width: 56ch">
-        Contributor pages live at <code>/p/handle/</code> and appear only once their owner publishes them. If you expected one here, it may still be private, or the handle may be spelt differently.
+  <main id="main" class="section" style="padding-top: 96px; padding-bottom: 120px">
+    <div class="wrap">
+      <p class="numerals" aria-label="404">4<span class="o">0</span>4</p>
+      <h1 class="h-statement mt-4">There is no page here.</h1>
+      <p class="lead mt-3" style="max-width: 56ch">
+        Contributor pages live at <code class="inline-code">/p/handle/</code> and appear only once their owner publishes them. If you expected one here, it may still be private, or the handle may be spelt differently.
       </p>
       <div class="row mt-4">
-        <a href="/" class="btn btn-primary">Home</a>
-        <a href="/cohorts/" class="btn btn-secondary">Cohorts</a>
-        <a href={SITE.repoUrl} class="btn btn-secondary">GitHub</a>
+        <a href="/" class="btn btn-primary">Nest home</a>
+        <a href="/cohorts/" class="btn btn-secondary">Browse cohorts</a>
+        <a href={SITE.repoUrl} class="btn btn-secondary">GitHub <span class="arrow" aria-hidden="true">&#8599;</span></a>
       </div>
     </div>
   </main>

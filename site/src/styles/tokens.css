@@ -1,0 +1,68 @@
+/* Design scope v1, the logo palette. Values from docs/design/design-scope-v1.md.
+   The raw logo cyan (--brand) is never used for text: it fails contrast on white. */
+:root {
+  --brand: #24c2ce;
+  --primary: #0a6e78;
+  --primary-deep: #0b3a40;
+  --primary-soft: #e6f6f7;
+  --accent: #e35d06;
+  --accent-ink: #a8460a;
+  --accent-soft: #fcebdd;
+  --foreground: #12262a;
+  --ink-2: #35505a;
+  --muted-fg: #5a6b70;
+  --background: #f7f9f9;
+  --card: #ffffff;
+  --border: #dfe6e7;
+  --border-strong: #b3c6c9;
+  --success: #2e7d5b;
+  --success-soft: #e7f3ec;
+  --grey-marker: #8fa19d;
+
+  --radius-sm: 6px;
+  --radius-btn: 8px;
+  --radius-input: 10px;
+  --radius-card: 14px;
+  --shadow-card: 0 1px 2px rgba(18, 38, 42, 0.06);
+  --ring: 0 0 0 4px rgba(10, 110, 120, 0.12);
+
+  --font-head: 'Clash Display', 'Satoshi', system-ui, sans-serif;
+  --font-body: 'Satoshi', system-ui, sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Mono', SFMono-Regular, Menlo, Consolas, monospace;
+  --gutter: clamp(16px, 4vw, 48px);
+
+  /* Names from the first design, kept as aliases so nothing that still uses them breaks. */
+  --teal: var(--primary);
+  --teal-deep: var(--primary-deep);
+  --teal-soft: var(--primary-soft);
+  --teal-mint: var(--brand);
+  --teal-mid: var(--primary);
+  --orange: var(--accent);
+  --orange-ink: var(--accent-ink);
+  --orange-soft: var(--accent-soft);
+  --paper: var(--background);
+  --ink: var(--foreground);
+  --muted: var(--muted-fg);
+  --line: var(--border);
+  --line-dash: var(--border-strong);
+  --green: var(--success);
+  --green-soft: var(--success-soft);
+  --radius: var(--radius-card);
+}
+
+/* The original brand sheet, one attribute away: <html data-palette="classic">. */
+:root[data-palette='classic'] {
+  --brand: #9fd9cf;
+  --primary: #0e5450;
+  --primary-deep: #093734;
+  --primary-soft: #eaf2f0;
+  --accent: #e8622c;
+  --accent-ink: #b3401e;
+  --accent-soft: #fbede5;
+  --foreground: #17211f;
+  --ink-2: #39504c;
+  --muted-fg: #5e6b68;
+  --background: #fafaf6;
+  --border: #e3e1d8;
+  --border-strong: #b9c4c1;
+}
