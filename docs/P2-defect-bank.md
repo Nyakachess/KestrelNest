@@ -2,6 +2,8 @@
 
 Copied from the Kestrel repository's `docs/kestrel-ai-patterns-plan.md`, section P2, on 2026-10-26, so this repository holds the plan it implements. Section 0 of that plan (model output is a suggestion a person reviews; provenance on every asset) applies; in Kestrel it is decision D-39.
 
+The plan names the new decision record ADR 0008. That number was taken by the visual system record, so the defect bank is [ADR 0009](adr/0009-defect-bank-in-three-tiers.md). The commands are `nest defect-request`, `nest defect-import`, `nest defect-check` and `nest defect-promote`; the logic lives in `packages/cli/src/defect-bank/` because Node 20, the repository's floor, cannot run TypeScript files directly.
+
 ## The plan text
 
 **Why.** Every Nest scaffold plants one of five defects, chosen from the handle
