@@ -58,3 +58,9 @@ Start with [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md). It is written for someo
 ## License
 
 MIT. See [LICENSE](LICENSE).
+
+## Documents
+
+- [Contributing](docs/CONTRIBUTING.md): the first pull request, step by step.
+- [Roadmap](docs/roadmap.md) and [decisions](docs/adr/).
+- [Privacy](docs/PRIVACY.md), [governance](docs/GOVERNANCE.md), [code of conduct](CODE_OF_CONDUCT.md), [security](SECURITY.md).
