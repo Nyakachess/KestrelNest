@@ -33,6 +33,22 @@ describe('withRetry', () => {
     ).toThrow('thing failed after 3 attempts: still broken')
     expect(calls).toBe(3)
   })
+
+  it('says how many attempts it made when an error is not worth retrying', () => {
+    let calls = 0
+    const setting = Object.assign(new Error('a setting is off'), { retryable: false })
+    expect(() =>
+      withRetry(
+        'thing',
+        () => {
+          calls += 1
+          throw setting
+        },
+        { attempts: 3, baseMs: 0, sleep: () => {} },
+      ),
+    ).toThrow('thing failed after 1 attempt: a setting is off')
+    expect(calls).toBe(1)
+  })
 })
 
 describe('retryDelayMs', () => {

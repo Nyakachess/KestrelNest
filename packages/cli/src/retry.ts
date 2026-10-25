@@ -36,7 +36,9 @@ export function withRetry<T>(label: string, fn: () => T, opts: RetryOptions = {}
   const sleep = opts.sleep ?? blockingSleep
   const now = opts.now ?? Date.now
   let last: unknown
+  let tried = 0
   for (let attempt = 1; attempt <= attempts; attempt++) {
+    tried = attempt
     try {
       return fn()
     } catch (error) {
@@ -49,5 +51,5 @@ export function withRetry<T>(label: string, fn: () => T, opts: RetryOptions = {}
     }
   }
   const message = last instanceof Error ? last.message : String(last)
-  throw new Error(`${label} failed after ${attempts} attempts: ${message}`)
+  throw new Error(`${label} failed after ${tried} ${tried === 1 ? 'attempt' : 'attempts'}: ${message}`)
 }
