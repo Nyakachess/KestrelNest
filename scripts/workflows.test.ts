@@ -14,8 +14,15 @@ type Workflow = { name?: string; on?: unknown; jobs?: Record<string, Job> }
 describe('GitHub configuration as code', () => {
   const files = readdirSync(WORKFLOWS).filter((f) => f.endsWith('.yml'))
 
-  it('has the four workflows', () => {
-    expect(files.sort()).toEqual(['auto-merge.yml', 'ci.yml', 'labels.yml', 'practice-counts.yml'])
+  it('has the six workflows', () => {
+    expect(files.sort()).toEqual([
+      'auto-merge.yml',
+      'ci.yml',
+      'enroll.yml',
+      'labels.yml',
+      'onboarding.yml',
+      'practice-counts.yml',
+    ])
   })
 
   it.each(files)('%s parses, has jobs with runners and steps, and points at scripts that exist', (file) => {
