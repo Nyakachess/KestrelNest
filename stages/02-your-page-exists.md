@@ -21,7 +21,8 @@ Your page is the thing that keeps growing for as long as you contribute, anywher
 4. Check-in (one line): post here what your intro says. Not for approval, for the habit of saying things before they ship.
 5. Run `npm run validate`. It names the file, the line, the field and what to change. Fix only what it names, then run it again, until it says "no problems".
 6. Set `visibility.page` to `public` in `profile.yml`.
-7. Run `npm test`, then commit and push:
+7. See it on your own machine before anyone else does: run `npm run dev` and open http://localhost:4321/p/{{handle}}/ in your browser. Read it as a stranger would. Edit, save, reload, until it reads right. Press Ctrl+C in the terminal to stop.
+8. Run `npm test`, then commit and push:
 
    ```bash
    git commit -am "feat: publish the page for {{handle}}"
@@ -30,8 +31,8 @@ Your page is the thing that keeps growing for as long as you contribute, anywher
 
    Open the pull request and write `Closes #` and this issue's number.
 
-8. The checks run, and a preview of the site is built from your branch. Open the preview link on the pull request and read your page as a stranger would.
-9. This pull request changes only your own directory, so it merges on its own once the checks are green. A few minutes later your page is live at {{site}}/p/{{handle}}/.
+9. The checks run, and a preview of the site is built from your branch. Open the preview link on the pull request and read your page as a stranger would.
+10. This pull request changes only your own directory, so it merges on its own once the checks are green. A few minutes later your page is live at {{site}}/p/{{handle}}/.
 
 ## Done when
 

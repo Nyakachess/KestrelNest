@@ -81,7 +81,9 @@ export function renderReadme(plan: ScaffoldPlan, repoUrl: string): string {
     '- `profile.test.ts`: the tests that guard your page. Stage 4 adds one.',
     '- `.practice.json`: counts written by a workflow after your pull requests merge. Never edit it by hand.',
     '',
-    'Before you push: `npm run validate` tells you the file, the line and the field of anything that needs changing.',
+    'Before you push: `npm run validate` tells you the file, the line and the field of anything that needs changing. To see your page, run `npm run dev` and open http://localhost:4321/p/' +
+      plan.handle +
+      '/ (once it is public).',
     '',
     `Your issues, in order: ${repoUrl}/issues?q=is%3Aopen+assignee%3A${plan.handle}+label%3Aonboarding`,
     '',

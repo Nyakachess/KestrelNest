@@ -17,6 +17,7 @@
   "scripts": {
     "build": "tsc -b && npm run build -w site",
     "dev": "npm run dev -w site",
+    "start": "npm run dev -w site",
     "preview": "npm run preview -w site",
     "test": "vitest run",
     "typecheck": "tsc -b --dry",

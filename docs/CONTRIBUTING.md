@@ -77,6 +77,8 @@ npm run lint       # confirms formatting and that no em dash slipped in
 
 `nest validate` tells you the file, the line, the field and what to change, in that order. Fix only what it names and run it again. CI runs exactly these commands, so if they pass here they pass there.
 
+Two things that catch everyone once. Every command starts with `npm run`, except `npm install` and `npm test`; `npm build` on its own prints "Unknown command". And to see your page before you push, run `npm run dev` and open http://localhost:4321/p/your-handle/ (once the page is public; private pages are not built). Press Ctrl+C to stop it.
+
 ## 5. Commit
 
 ```bash
