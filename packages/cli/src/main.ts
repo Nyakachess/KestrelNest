@@ -1,4 +1,5 @@
 import { flagBool, flagString, parseArgs, UsageError } from './args.js'
+import { runDefectRequest } from './commands/defect-request.js'
 import { enroll, type EnrollMode } from './commands/enroll.js'
 import { runFeed } from './commands/feed.js'
 import { runNewTask } from './commands/new-task.js'
@@ -27,6 +28,8 @@ Usage: nest <command> [options]
       --name "<Name>" --cohort <id|none> [--gh] [--dry-run]
   open-cohort <id>                 Enrol every member of a cohort.
       [--gh] [--dry-run]
+  defect-request --round <n>       Write the request file for a round of candidate defects (P2).
+      [--count <n>] [--out <file>]
 
 Every command accepts --root <dir>. Without it the repository is found from the current directory.
 --dry-run prints what would happen and makes no GitHub calls. Without --gh the bodies are printed instead.`
@@ -109,6 +112,17 @@ export function main(argv: readonly string[]): number {
       if (!id) throw new UsageError('open-cohort needs a cohort id: nest open-cohort <id>')
       const report = openCohort(config, { id, mode }, ghFor(config, mode), io)
       return report.failed.length > 0 ? 1 : 0
+    }
+    case 'defect-request': {
+      const round = Number(flagString(flags, 'round'))
+      if (!Number.isInteger(round) || round < 1)
+        throw new UsageError('defect-request needs --round <n>, a whole number from 1.')
+      const count = flagString(flags, 'count')
+      return runDefectRequest(
+        config,
+        { round, count: count === undefined ? undefined : Number(count), out: flagString(flags, 'out') },
+        io,
+      )
     }
     default:
       throw new UsageError(`Unknown command "${command}". Run nest help to see the commands.`)
