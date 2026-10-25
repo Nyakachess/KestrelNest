@@ -8,6 +8,17 @@ updates:
       all:
         patterns: ['*']
     labels: [good-shared-issue]
+    # Node 20 is the floor (.nvmrc, docs/adr/0001-one-stack.md). These packages need Node 22 from
+    # their next major, so dependabot proposes only minor and patch updates for them.
+    ignore:
+      - dependency-name: astro
+        update-types: ['version-update:semver-major']
+      - dependency-name: vitest
+        update-types: ['version-update:semver-major']
+      - dependency-name: typescript
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@types/node'
+        update-types: ['version-update:semver-major']
   - package-ecosystem: github-actions
     directory: /
     schedule:
