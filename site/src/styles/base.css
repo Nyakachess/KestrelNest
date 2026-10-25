@@ -363,3 +363,15 @@ h3 {
 .more:hover {
   text-decoration: underline;
 }
+
+/* Sticky footer: the page fills the viewport and main takes the spare height, so the footer
+   sits at the bottom even when a page has little or no content. */
+body {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+body > main {
+  flex: 1 0 auto;
+}
