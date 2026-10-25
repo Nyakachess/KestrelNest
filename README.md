@@ -21,7 +21,7 @@ Seven stages. An invitation, not a gate. Experienced already? Skip to Stage 5 or
 ## Quick start
 
 ```bash
-git clone https://github.com/kestrel-collective/nest.git
+git clone https://github.com/Nyakachess/KestrelNest.git
 cd nest
 npm install
 npm test

@@ -1,4 +1,6 @@
-# Every path is reviewed by the maintainers team. Contributor directories are the exception
+# Every path is reviewed by the repository owner. This is a user-owned repository, so there is no
+# maintainers team yet; when the kestrel-collective organisation exists, this line becomes
+# "* @kestrel-collective/maintainers". Contributor directories are the exception
 # in practice: the auto-merge workflow merges a pull request on its own when every changed
 # file is inside the author's own contributors/<login>/ directory and CI is green.
-* @kestrel-collective/maintainers
+* @Nyakachess

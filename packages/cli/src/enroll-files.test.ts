@@ -26,7 +26,7 @@ describe('addCohortMember', () => {
 })
 
 describe('addCodeownersLine', () => {
-  const header = '# Everything is reviewed by maintainers.\n* @kestrel-collective/maintainers\n'
+  const header = '# Everything is reviewed by maintainers.\n* @Nyakachess\n'
 
   it('adds a sorted block at the end and keeps the header', () => {
     const first = addCodeownersLine(header, 'test-two')

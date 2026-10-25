@@ -60,7 +60,7 @@ function plainMessage(issue: Issue, field: string): string {
       if (issue.format === 'regex' && field === 'cohort')
         return 'must be a year and month written as YYYY-MM, for example 2027-01.'
       if (issue.format === 'regex' && field.endsWith('.repo'))
-        return 'must be written as owner/name, for example kestrel-collective/nest.'
+        return 'must be written as owner/name, for example Nyakachess/KestrelNest.'
       return 'is not in the expected format.'
     }
     case 'invalid_value': {

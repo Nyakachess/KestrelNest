@@ -11,7 +11,7 @@ How to get Nest running on your own machine. For the full first-pull-request wal
 ## Setup
 
 ```bash
-git clone https://github.com/kestrel-collective/nest.git
+git clone https://github.com/Nyakachess/KestrelNest.git
 cd nest
 npm install
 npm test

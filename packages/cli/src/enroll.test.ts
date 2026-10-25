@@ -9,7 +9,7 @@ import { cleanup, tempRepo } from './test-support.js'
 
 afterEach(cleanup)
 
-const OWNERS = '* @kestrel-collective/maintainers\n'
+const OWNERS = '* @Nyakachess\n'
 const quiet = { sleep: () => {}, baseMs: 0 }
 const opts = (over: Partial<EnrollOptions> = {}): EnrollOptions => ({
   handle: 'test-three',
@@ -37,7 +37,7 @@ describe('enroll', () => {
     expect(filePr?.files['cohorts/2027-01/cohort.yml']).toContain(
       '  - test-one\n  - test-three\n  - test-two\n',
     )
-    expect(filePr?.files['.github/CODEOWNERS']).toContain('* @kestrel-collective/maintainers\n')
+    expect(filePr?.files['.github/CODEOWNERS']).toContain('* @Nyakachess\n')
     expect(filePr?.files['.github/CODEOWNERS']).toContain('/contributors/test-three/ @test-three')
 
     expect(gh.prs[0]).toMatchObject({

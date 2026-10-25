@@ -9,7 +9,7 @@ import { cleanup, cohortYml, tempRepo } from './test-support.js'
 
 afterEach(cleanup)
 
-const OWNERS = '* @kestrel-collective/maintainers\n'
+const OWNERS = '* @Nyakachess\n'
 const quiet = { sleep: () => {}, baseMs: 0 }
 const opts = (over: Partial<EnrollOptions> = {}): EnrollOptions => ({
   handle: 'test-three',

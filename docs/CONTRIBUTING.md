@@ -25,7 +25,7 @@ This guide assumes you have never opened a pull request. If you have, skim the h
 If you are a cohort member you have write access and can push branches directly. Otherwise fork the repository first (the Fork button on GitHub) and clone your fork instead.
 
 ```bash
-git clone https://github.com/kestrel-collective/nest.git
+git clone https://github.com/Nyakachess/KestrelNest.git
 cd nest
 npm install
 npm test
