@@ -1,7 +1,23 @@
-Hello {{name}}. This is your Stage 6 issue, Review a peer, for cohort {{cohort}}.
+Hello {{name}}. This is Stage {{stage_number}} of the ladder, {{stage_title}}, for cohort {{cohort}}.
 
-The full steps for this stage are written in Step 7 of the build. Until then:
+## Why this stage exists
 
-- Repository: {{repo_url}}
-- Your directory: {{repo_url}}/tree/main/contributors/{{handle}}
-- Site: {{site}}
+Review is half of open-source work, and the half most people are never taught. In this stage you do both sides: review someone else's pull request properly, and have one of yours reviewed by a peer.
+
+## Steps
+
+1. Find an open pull request from another cohort member: [open pull requests not by you]({{repo_url}}/pulls?q=is%3Apr+is%3Aopen+-author%3A{{handle}}). Stage 2 to 5 pull requests are all fine to review.
+2. Read the description first, then the diff. Check out the branch and run it: `git fetch origin && git switch <branch>`, then `npm test` and, for a page, `npm run dev` to look at it.
+3. Leave at least one comment on a specific line. Say what you see, why it matters, and what you would change. Questions are good comments. "Looks good" on its own is not a review.
+4. Finish the review: approve if you would merge it, or request changes if something has to change first. Either is a real outcome.
+5. Now the other side: ask a cohort member to review one of your open pull requests, or your next one. Reply to every comment they leave, with a change or a reason. Thank them in the pull request.
+
+## Done when
+
+- [ ] You reviewed a peer's pull request with at least one line comment and a verdict, and that pull request has since merged.
+- [ ] A peer reviewed one of yours and you answered every comment.
+- [ ] You can name one thing you would do differently in your own code after reading theirs.
+
+## If you get stuck
+
+If there is no open pull request to review, say so here; a maintainer will point you at one, possibly in shared code. If a review you received felt unkind, see CODE_OF_CONDUCT.md and tell a maintainer.

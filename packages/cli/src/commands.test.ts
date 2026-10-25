@@ -65,7 +65,7 @@ describe('new-task command', () => {
     expect(runNewTask(config, { stage: 3, handle: 'test-one' }, null, io)).toBe(0)
     expect(io.lines[0]).toBe('# Stage 3: Fix your defect (@test-one)')
     expect(io.lines[1]).toContain('onboarding, cohort:2027-01, stage:3')
-    expect(io.lines.join('\n')).toContain('contributors/test-one')
+    expect(io.lines.join('\n')).toContain('https://nest.example.test/p/test-one/')
     expect(io.lines.join('\n')).not.toContain('{{')
   })
 
