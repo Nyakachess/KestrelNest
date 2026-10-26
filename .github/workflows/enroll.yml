@@ -52,9 +52,18 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - name: A token for commits to main, from the Nest bot app when it is configured
+        id: app
+        if: vars.NEST_BOT_APP_ID != ''
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.NEST_BOT_APP_ID }}
+          private-key: ${{ secrets.NEST_BOT_PRIVATE_KEY }}
       - name: Enrol
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # only for the commit that adds the person to their cohort file (step a); see cohort.yml
+          NEST_MAIN_TOKEN: ${{ steps.app.outputs.token }}
           # only for the collaborator invitation, which the workflow token is not allowed to send:
           # a token from a repository admin with Administration: write (see docs/ENROLMENT.md)
           NEST_ADMIN_TOKEN: ${{ secrets.NEST_ADMIN_TOKEN }}

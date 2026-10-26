@@ -20,7 +20,22 @@ Everything that cannot be a file in the repository. Follow it top to bottom in t
 - [ ] Require status checks to pass: `checks` (the CI workflow job). Require branches to be up to date.
 - [ ] Require review from code owners.
 - [ ] Block force pushes and deletions.
-- [ ] Bypass list: add the `github-actions[bot]` actor (or "Repository admin" if the actor option is missing) so the practice-counts workflow can push its commit to `main`. Nothing else bypasses.
+- [ ] Bypass list: add the **Nest bot** GitHub App (next section). Nothing else bypasses. The workflows' own token (`github-actions[bot]`) cannot be put on a bypass list, and "Repository admin" does not cover it, so without the app three things fail once this rule is on: the practice counts, a new cohort's file (the Cohort workflow) and adding each new member to their cohort (Enrol step a).
+
+## The Nest bot GitHub App (commits to `main`)
+
+The practice-counts, Cohort and Enrol workflows commit straight to `main`. They do it with a short-lived token from a GitHub App that the ruleset lets through. Set it up before turning on the rule above.
+
+- [ ] Organisation **Settings**, **Developer settings**, **GitHub Apps**, **New GitHub App**. Name `kestrel-nest-bot` (any free name). Homepage `https://nest.kestrelcollective.org`. **Webhook**: untick **Active**.
+- [ ] **Permissions**, **Repository permissions**: **Contents: Read and write**. Nothing else (Metadata read-only is added by itself).
+- [ ] **Where can this GitHub App be installed?**: **Only on this account**. **Create GitHub App**.
+- [ ] On the app's page note the **App ID**. Scroll to **Private keys**, **Generate a private key**: a `.pem` file downloads. Keep it in the password manager.
+- [ ] **Install App** (left menu), the organisation, **Only select repositories**: `nest`. **Install**.
+- [ ] This repository, **Settings**, **Secrets and variables**, **Actions**: on the **Variables** tab add `NEST_BOT_APP_ID` = the App ID; on the **Secrets** tab add `NEST_BOT_PRIVATE_KEY` = the whole contents of the `.pem` file, from `-----BEGIN` to `-----END`.
+- [ ] Now add the app to the ruleset's bypass list (above): **Add bypass**, **Apps**, `kestrel-nest-bot`, mode **Always**.
+- [ ] Check: run **Practice counts** from the Actions tab; its "A token for commits to main" step is green, not skipped.
+
+Without `NEST_BOT_APP_ID` the workflows use their own token, which works only while `main` has no rule requiring pull requests (a fork for development, for example).
 
 ## Repository: Actions
 

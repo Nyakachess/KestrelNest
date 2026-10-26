@@ -85,6 +85,6 @@ POST https://api.github.com/repos/kestrel-collective/nest/dispatches
 
 ## Limits worth knowing
 
-- Step a and the Cohort workflow commit straight to `main`. If `main` is protected against the workflow (a rule requiring pull requests, with no bypass for GitHub Actions), they fail with a message naming the rule instead of falling back to a pull request: let `github-actions` bypass the rule for `main`, or turn the rule off for it.
+- Step a and the Cohort workflow commit straight to `main`, with a token from the Nest bot GitHub App (`NEST_BOT_APP_ID`, `NEST_BOT_PRIVATE_KEY`) that `main`'s ruleset lets through; docs/REPO-SETTINGS.md sets it up. Without the app they use the workflow token, which a rule requiring pull requests refuses (and which cannot be put on a bypass list); they then fail with a message naming the fix instead of falling back to a pull request.
 - Pull requests created with the workflow's own token do not trigger workflows, so the bot's scaffold pull request does not get CI until a maintainer pushes to it or closes and reopens it. Setting a fine-grained token with Contents, Pull requests and Issues write as the repository secret `NEST_BOT_TOKEN` and using it in `enroll.yml` lifts that limit.
 - Individual joiners (`cohort: none`) have no cohort file to change and no milestone; their profile has no `cohort` field until they join one.
