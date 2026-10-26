@@ -33,11 +33,17 @@ export class GhCli implements Gh {
    * Enrol workflow passes the NEST_ADMIN_TOKEN secret: a token from a repository admin with
    * Administration: write. Everything else keeps the workflow token, so the issues and pull
    * requests are still opened by the bot.
+   *
+   * `mainToken` is used only for commits straight to main (a cohort's file and its members).
+   * A ruleset that requires pull requests cannot list the workflow token as a bypass actor, so
+   * the workflows pass a token from the Nest bot GitHub App, which can be on that list
+   * (docs/REPO-SETTINGS.md). Empty, the workflow token is used, which works while main allows it.
    */
   constructor(
     private readonly root: string,
     private readonly slug: string,
     private readonly adminToken: string = '',
+    private readonly mainToken: string = '',
   ) {}
 
   static available(): boolean {
@@ -353,6 +359,7 @@ export class GhCli implements Gh {
         this.gh(
           ['api', ...args, ...(body === undefined ? [] : ['--input', '-'])],
           body === undefined ? undefined : JSON.stringify(body),
+          this.mainToken || undefined,
         ) || '{}',
       ) as Record<string, unknown>
     for (let attempt = 1; attempt <= MAIN_ATTEMPTS; attempt++) {
@@ -440,9 +447,10 @@ export function explainProtectedMain(e: unknown): unknown {
   const text = e instanceof Error ? e.message : String(e)
   if (!/protected (branch|ref)|branch protection|repository rule|rule violations?/i.test(text)) return e
   const err = new Error(
-    'main is protected against the workflow, so the bot cannot commit cohort files to it. In the ' +
-      "repository's settings (Rules or Branches), let github-actions bypass the rule for main, or turn off " +
-      '"Require a pull request before merging" for it. GitHub said: ' +
+    'main is protected against the workflow, so the bot cannot commit cohort files to it. Set up the ' +
+      'Nest bot GitHub App (the NEST_BOT_APP_ID variable and NEST_BOT_PRIVATE_KEY secret) and add it to ' +
+      "the bypass list of main's ruleset (docs/REPO-SETTINGS.md). The workflow token itself cannot be " +
+      'on that list. GitHub said: ' +
       text,
   )
   ;(err as Error & { retryable?: boolean }).retryable = false

@@ -51,7 +51,15 @@ jobs:
       - run: npm ci
       - name: Build the CLI
         run: npx tsc -b
+      - name: A token for commits to main, from the Nest bot app when it is configured
+        id: app
+        if: vars.NEST_BOT_APP_ID != ''
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.NEST_BOT_APP_ID }}
+          private-key: ${{ secrets.NEST_BOT_PRIVATE_KEY }}
       - name: Open the cohort
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NEST_MAIN_TOKEN: ${{ steps.app.outputs.token }}
         run: node packages/cli/bin/nest.js cohort-open "$ID" --name "$NAME" --starts "$STARTS" --ends "$ENDS" --gh

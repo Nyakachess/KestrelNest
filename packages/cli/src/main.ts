@@ -54,7 +54,12 @@ function ghFor(config: { root: string; slug: string }, mode: EnrollMode): Gh {
   if (mode !== 'apply') return new NullGh()
   if (!GhCli.available())
     throw new UsageError('GitHub CLI (gh) is not installed or not on PATH, so --gh cannot be used.')
-  return new GhCli(config.root, config.slug, process.env.NEST_ADMIN_TOKEN ?? '')
+  return new GhCli(
+    config.root,
+    config.slug,
+    process.env.NEST_ADMIN_TOKEN ?? '',
+    process.env.NEST_MAIN_TOKEN ?? '',
+  )
 }
 
 export function main(argv: readonly string[]): number | Promise<number> {
