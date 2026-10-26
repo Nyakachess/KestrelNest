@@ -42,11 +42,16 @@ export function readConfig(root: string): RepoConfig {
     version?: string
   }
   const repository = typeof pkg.repository === 'string' ? pkg.repository : (pkg.repository?.url ?? '')
-  const slug = repository
-    .replace(/^github:/, '')
-    .replace(/^git\+/, '')
-    .replace(/^https?:\/\/github\.com\//, '')
-    .replace(/\.git$/, '')
+  // Inside GitHub Actions the repository the workflow runs in wins, so a fork (a development copy
+  // of Nest) opens its issues, pull requests and invitations in itself, never in the original.
+  const running = (process.env.GITHUB_REPOSITORY ?? '').trim()
+  const slug = /^[^/\s]+\/[^/\s]+$/.test(running)
+    ? running
+    : repository
+        .replace(/^github:/, '')
+        .replace(/^git\+/, '')
+        .replace(/^https?:\/\/github\.com\//, '')
+        .replace(/\.git$/, '')
   if (!/^[^/\s]+\/[^/\s]+$/.test(slug)) {
     throw new UsageError(
       `package.json needs a repository field like "github:owner/name" (found "${repository}").`,
