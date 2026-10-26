@@ -32,7 +32,7 @@ The practice-counts, Cohort and Enrol workflows commit straight to `main`. They 
 - [ ] On the app's page note the **App ID**. Scroll to **Private keys**, **Generate a private key**: a `.pem` file downloads. Keep it in the password manager.
 - [ ] **Install App** (left menu), the organisation, **Only select repositories**: `nest`. **Install**.
 - [ ] This repository, **Settings**, **Secrets and variables**, **Actions**: on the **Variables** tab add `NEST_BOT_APP_ID` = the App ID; on the **Secrets** tab add `NEST_BOT_PRIVATE_KEY` = the whole contents of the `.pem` file, from `-----BEGIN` to `-----END`.
-- [ ] Now add the app to the ruleset's bypass list (above): **Add bypass**, **Apps**, `kestrel-nest-bot`, mode **Always**.
+- [ ] Now add the app to the ruleset's bypass list (above): **Add bypass**, **Apps**, `kestrel-nest-bot`, mode **Always allow**.
 - [ ] Check: run **Practice counts** from the Actions tab; its "A token for commits to main" step is green, not skipped.
 
 Without `NEST_BOT_APP_ID` the workflows use their own token, which works only while `main` has no rule requiring pull requests (a fork for development, for example).
